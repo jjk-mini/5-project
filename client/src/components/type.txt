@@ -1,0 +1,121 @@
+page AboutUs
+gallery 
+Amenities
+
+
+
+
+room services
+housekeeping 
+transportation
+concierge
+Events
+aboutus
+services
+
+location map 
+
+
+import React, { useState } from "react";
+import { COLORS } from "../constants/theme";
+
+const SpecialRequests = () => {
+  const [request, setRequest] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Backend baad me connect karenge
+    console.log(request);
+
+    // UI ke liye abhi textbox clear kar do
+    setRequest("");
+  };
+
+  return (
+    <div className="w-full mt-3">
+      <div
+        className="rounded-3xl border shadow-md p-6 sm:p-8"
+        style={{
+          backgroundColor: COLORS.SURFACE,
+          borderColor: COLORS.BORDER,
+        }}
+      >
+        {/* Heading */}
+        <h2
+          className="text-2xl font-bold"
+          style={{ color: COLORS.PRIMARY }}
+        >
+          Special Requests
+        </h2>
+
+        {/* Description */}
+        <p
+          className="mt-2 text-sm leading-6"
+          style={{ color: COLORS.TEXT_SECONDARY }}
+        >
+          Special requests cannot be guaranteed, but the property will do its
+          best to meet your needs. You can always make a special request after
+          your booking is complete.
+        </p>
+
+        <form onSubmit={handleSubmit}>
+          {/* Label */}
+          <label
+            className="block mt-6 mb-2 text-sm font-semibold"
+            style={{ color: COLORS.TEXT_PRIMARY }}
+          >
+            Please write your request in English
+            <span
+              className="font-normal"
+              style={{ color: COLORS.TEXT_SECONDARY }}
+            >
+              {" "}
+              (Optional)
+            </span>
+          </label>
+
+          {/* Textarea */}
+          <textarea
+            rows={5}
+            value={request}
+            onChange={(e) => setRequest(e.target.value)}
+            placeholder="Write your special request here..."
+            className="w-full rounded-xl p-4 resize-none outline-none transition-all"
+            style={{
+              border: `1px solid ${COLORS.BORDER}`,
+              color: COLORS.TEXT_PRIMARY,
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = COLORS.ACCENT;
+              e.target.style.boxShadow = `0 0 0 2px ${COLORS.ACCENT}`;
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = COLORS.BORDER;
+              e.target.style.boxShadow = "none";
+            }}
+          />
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="mt-5 w-full rounded-xl py-3 text-white font-semibold transition duration-300"
+            style={{
+              backgroundColor: COLORS.PRIMARY,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = "0.9";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = "1";
+            }}
+          >
+            Submit Request
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default SpecialRequests;

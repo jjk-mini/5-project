@@ -1,0 +1,1 @@
+// Utility — calculate room rate x nights + extras + tax

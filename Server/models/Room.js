@@ -1,0 +1,1 @@
+// Room schema — type, price, status enum

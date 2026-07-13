@@ -1,0 +1,1 @@
+// Booking routes — create, cancel, check-in, check-out

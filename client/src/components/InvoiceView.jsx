@@ -1,0 +1,1 @@
+// InvoiceView component — itemized bill display

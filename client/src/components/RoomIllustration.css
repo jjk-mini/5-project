@@ -1,0 +1,48 @@
+.room-illustration {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.room-illustration__icon {
+  font-size: 56px;
+  z-index: 2;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+}
+
+.room-illustration__ring {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  z-index: 1;
+}
+
+.room-illustration__ring::before {
+  content: '';
+  position: absolute;
+  inset: -22px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.illustration--standard {
+  background: linear-gradient(135deg, var(--color-info), #2d4a6b);
+}
+
+.illustration--deluxe {
+  background: linear-gradient(135deg, var(--color-accent), #a9793a);
+}
+
+.illustration--suite {
+  background: linear-gradient(135deg, var(--color-primary), #7a2540);
+}
+
+.illustration--presidential {
+  background: linear-gradient(135deg, #7a2540, var(--color-accent));
+}
