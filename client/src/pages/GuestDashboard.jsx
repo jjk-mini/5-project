@@ -19,7 +19,7 @@ import {
   Waves,
   CheckCircle2
 } from "lucide-react";
-import AsideBarGuest from "../components/AsidebarGuest"
+import AsideBarGuest from "../components/AsideBarGuest"
 function GuestDashboard() {
   return (
     <div className="flex min-h-screen bg-[#F8F6F2]">

@@ -87,7 +87,7 @@ export default function RegisterPage(){
     // email 
     if(!formData.email){
         newErrors.email = "Email is required"
-    }else if (!/\S+@\.\S+/.test(formData.email)) {
+    }else if (!/\S+@\S+\.\S+/.test(formData.email)) {
         newErrors.email = "Enter a valid email address"
     }     
     

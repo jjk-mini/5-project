@@ -8,9 +8,9 @@ const User = require("../models/User")
 const protect = asyncHandler (async (req, res, next ) =>{
     let token
 
-    const authHeader = req.header.authorization
+const authHeader = req.headers.authorization;
 
-    if (authHeader && authHeader.startsWith("Bearer")) {
+    if (authHeader && authHeader.startsWith("Bearer ")) {
         token = authHeader.split(" ")[1]
     }
  if (!token) {
