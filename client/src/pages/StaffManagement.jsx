@@ -1,5 +1,6 @@
 // Staff management — list, create, edit, deactivate staffimport React, { useEffect, useState } from "react";
 import AsideBar from "../components/AsideBar";
+import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
 import { Link } from "react-router-dom";
 import {
   UserPlus,
@@ -14,6 +15,9 @@ import {
 import { useState, useEffect } from "react";
 
 const API_URL = "http://localhost:5000/api/staff";
+
+const tint = (hex, alpha = "1A") => `${hex}${alpha}`;
+
 
 function StaffManagement() {
   const [staff, setStaff] = useState([]);
@@ -110,6 +114,16 @@ function StaffManagement() {
     }
   };
 
+    const headingFont = { fontFamily: FONTS.HEADING };
+
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+
   return (
     <>
       {/* start Component */}
@@ -120,63 +134,91 @@ function StaffManagement() {
         <div className="flex-1 p-4 md:p-8">
 
           {/* Header */}
-          <div className="bg-linear-to-r from-[#5C1A2B] to-[#7A2840] rounded-3xl shadow-xl p-8 mb-8">
-
-            <div className="flex items-center gap-3">
-              <div className="bg-[#D9B26F] p-2.5 rounded-xl">
-                <Users size={26} className="text-[#5C1A2B]" />
-              </div>
-              <h1 className="text-2xl md:text-4xl font-bold text-white">
-                Staff Management
-              </h1>
-            </div>
-
-            <p className="text-[#F3D89B] mt-3 text-lg">
-              Add, edit, and manage your hotel's team members.
-            </p>
-
-            {/* dropdown start */}
-            <div className="mt-6 relative w-full md:w-80">
-              <label className="flex items-center gap-2 text-sm font-medium text-[#F3D89B] mb-2">
-                <LayoutDashboard size={16} />
-                Select Dashboard
-              </label>
-
-              <button
-                type="button"
-                onClick={() => setIsDashboardOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between border border-[#D9B26F] bg-[#D9B26F] text-[#5C1A2B] font-medium rounded-lg p-3 shadow-md focus:outline-none focus:ring-2 focus:ring-[#D9B26F]"
-              >
-                <span className="flex items-center gap-2">
-                  <LayoutDashboard size={18} />
-                  Select Dashboard
-                </span>
-                <ChevronDown
-                  size={18}
-                  className={`transition-transform ${isDashboardOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {isDashboardOpen && (
-                <ul className="absolute z-10 mt-2 w-full bg-white border border-[#D9B26F] rounded-lg shadow-lg overflow-hidden">
-                  {dashboardOptions.map((option) => (
-                    <li key={option.path}>
-                      <Link
-                        to={option.path}
-                        onClick={() => setIsDashboardOpen(false)}
-                        className="block w-full text-left px-4 py-3 text-[#5C1A2B] font-medium hover:bg-[#F3D89B]/40 transition-colors"
-                      >
-                        {option.label}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            {/* drop down end */}
-
-          </div>
-
+         <div
+                     className="p-6 sm:p-8"
+                     style={{
+                       background: `linear-gradient(to right, ${COLORS.PRIMARY}, ${COLORS.DARK})`,
+                       borderRadius: BORDER_RADIUS.LARGE,
+                       boxShadow: SHADOWS.CARD,
+                     }}
+                   >
+                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+         
+                       <div>
+                         <p className="text-sm font-medium" style={{ color: `${COLORS.CREAM}CC` }}>
+                           Good morning,
+                         </p>
+                         <h1 className="text-2xl sm:text-3xl font-bold text-white mt-1" style={headingFont}>
+                           Admin User
+                         </h1>
+                         <div className="flex items-center gap-3 mt-3">
+                           <span
+                             className="text-xs font-semibold px-3 py-1"
+                             style={{ color: COLORS.PRIMARY, backgroundColor: COLORS.ACCENT, borderRadius: BORDER_RADIUS.PILL }}
+                           >
+                             Admin
+                           </span>
+                           <span className="text-sm" style={{ color: `${COLORS.CREAM}B3` }}>
+                             {today}
+                           </span>
+                         </div>
+                       </div>
+         
+                       {/* Dropdown start */}
+                       <div className="relative w-full sm:w-72">
+                         <button
+                           type="button"
+                           onClick={() => setIsDashboardOpen((prev) => !prev)}
+                           className="w-full flex items-center justify-between gap-2 font-semibold px-5 py-3 transition-colors focus:outline-none"
+                           style={{
+                             backgroundColor: COLORS.SURFACE,
+                             color: COLORS.PRIMARY,
+                             borderRadius: BORDER_RADIUS.MEDIUM,
+                             boxShadow: SHADOWS.DROPDOWN,
+                           }}
+                         >
+                           <span className="flex items-center gap-2">
+                             <LayoutDashboard size={18} />
+                             Select Dashboard
+                           </span>
+                           <ChevronDown
+                             size={18}
+                             className={`transition-transform ${isDashboardOpen ? "rotate-180" : ""}`}
+                           />
+                         </button>
+         
+                         {isDashboardOpen && (
+                           <ul
+                             className="absolute right-0 z-10 mt-2 w-full overflow-hidden"
+                             style={{
+                               backgroundColor: COLORS.SURFACE,
+                               border: `1px solid ${COLORS.BORDER}`,
+                               borderRadius: BORDER_RADIUS.MEDIUM,
+                               boxShadow: SHADOWS.DROPDOWN,
+                             }}
+                           >
+                             {dashboardOptions.map((option) => (
+                               <li key={option.path}>
+                                 <Link
+                                   to={option.path}
+                                   onClick={() => setIsDashboardOpen(false)}
+                                   className="block w-full text-left px-4 py-3 font-medium transition-colors"
+                                   style={{ color: COLORS.PRIMARY }}
+                                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = tint(COLORS.ACCENT, "33"))}
+                                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                                 >
+                                   {option.label}
+                                 </Link>
+                               </li>
+                             ))}
+                           </ul>
+                         )}
+                       </div>
+                       {/* Dropdown end */}
+         
+                     </div>
+                   </div>
+<br></br>
           {/* Add Staff Form */}
 
           <div className="bg-white rounded-3xl shadow-xl border-t-4 border-[#5C1A2B] p-6 md:p-8">

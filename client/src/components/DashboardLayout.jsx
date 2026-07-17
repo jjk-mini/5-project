@@ -1,20 +1,35 @@
 import AsideBar from "./AsideBar";
+import Navbar from "./Navbar";
 import { COLORS, FONTS } from "../constants/theme";
+import { SIDEBAR_WIDTH } from "../constants/layout";
 
 const DashboardLayout = ({ children }) => {
   return (
     <div
-      className="flex min-h-screen"
       style={{
+        minHeight: "100vh",
         background: COLORS.BACKGROUND,
         fontFamily: FONTS.BODY,
       }}
     >
       <AsideBar />
 
-      <main className="flex-1 overflow-x-auto p-6 md:p-8">
-        {children}
-      </main>
+      <div
+        style={{
+          marginLeft: `${SIDEBAR_WIDTH}px`,
+          minHeight: "100vh",
+        }}
+      >
+        <Navbar />
+
+        <main
+          style={{
+            padding: "32px",
+          }}
+        >
+          {children}
+        </main>
+      </div>
     </div>
   );
 };

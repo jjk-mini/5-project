@@ -7,6 +7,7 @@ import { ROOM_STATUS, ROOM_STATUS_LABELS, ROOM_TYPES } from '../constants/roomSt
 import { ROLES, ROLE_LABELS, ROOM_MANAGEMENT_ALLOWED_ROLES } from '../constants/roles';
 import RoomCard from "../components/RoomCard";
 import RoomFormModal from "../components/RoomFormModal";
+import AsideBar from '../components/AsideBar';
 
 const RoomManagement = () => {
  const [role, setRole] = useState(ROLES.ADMIN);
@@ -113,10 +114,15 @@ const RoomManagement = () => {
   };
 
   return (
+    
     <div className="rm-page">
+
+             
+
       {/* Temporary role switcher for demoing role-based access before the
           real Auth/login module is wired up. Remove once AuthContext
           provides the actual logged-in user's role. */}
+
       <div className="rm-role-demo">
         <span>Demo — Viewing as:</span>
         <select value={role} onChange={(e) => setRole(e.target.value)}>
@@ -137,6 +143,7 @@ const RoomManagement = () => {
         </div>
       ) : (
       <>
+      
       <header className="rm-hero">
         <p className="rm-hero__eyebrow">LuxuryStay Hospitality</p>
         <h1 className="rm-hero__title">Luxury Hotel Room Management</h1>
@@ -151,6 +158,7 @@ const RoomManagement = () => {
           <span className="rm-add-btn__icon">+</span> Add Room
         </button>
       </div>
+
 
       <div className="rm-stats">
         <div className="rm-stat rm-stat--total">

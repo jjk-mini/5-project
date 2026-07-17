@@ -29,16 +29,12 @@ import Accommodations from "./pages/Accommodations"
 import RoomExperience from "./pages/RoomExperience";
 import PaymentForm from "./components/PaymentForm"
 import NewBookingModal from "./components/NewBookingModal";
-// const StaffManagement = ()=> <placeholder title="Staff Management"/>
-// const ProfilePage = ()=> <placeholder title="Profile Page "/>
-// const RoomManagement = ()=> <placeholder title="Room Management "/>
-// // const BookingPage = ()=> <placeholder title="Booking page "/>
-// const CheckInOut = ()=> <placeholder title=" check in out "/>
-// const HousekeepingPage = ()=> <placeholder title="Hosekeeping page "/>
-// const MantenanceRequestsPage = ()=> <placeholder title="maintenance requests page"/>
-// const GuestDashboard  = ()=> <placeholder title="GuestDashboard  "/>
-// const ReportsPage = ()=> <placehoAdminDashboardlder title="ReportsPage"/>
-// const FeedbackPage = ()=> <placeholder title="Admin Dashboard "/>
+import GuestServices from "./pages/GuestServices";
+import AboutUsPage from "./pages/AboutUsPage";
+import AmenitiesPage from "./pages/AmenitiesPage";
+import GalleryPage from "./pages/GalleryPage";
+import GuestProfilePage from "./pages/GuestProfilePage";
+
 
 function Placeholder({ title, owner }) {
   return (
@@ -102,19 +98,22 @@ switch (user?.role) {
     case ROLES.MANAGER: return  <Navigate to="/admin/dashboard" replace />;
     case ROLES.RECEPTIONIST: return <Navigate to="/receptionist/dashboard" replace />;
     case ROLES.HOUSEKEEPING: return <Navigate to="/housekeeping/dashboard" replace />;
-    case ROLES.GUEST:        return <Navigate to="/guest/dashboard" replace />;
+    // case ROLES.GUEST:        return <Navigate to="/guest/dashboard" replace />;
     default:                 return <Navigate to="/" replace />;
 
 }
 
 }
 
-function Layout({ children, showFooter = true }){
+// showNav defaults to true — pass showNav={false} on internal/dashboard
+// routes (admin, receptionist, housekeeping, profile, settings, staff) so
+// logged-in users see the sidebar-driven layout without the public navbar.
+function Layout({ children, showFooter, showNav = true }){
 return(
   <>
-  <Navbar/>
+  {showNav && <Navbar/>}
   <main>{children}</main>
-  {showFooter && <Footer/>}
+  {showFooter && <Footer/> }
   </>
 )
 }
@@ -123,10 +122,12 @@ export default function App(){
   return (
     <Routes>
       <Route path="/" element={
-        <Layout>
+        <Layout showFooter>
           <HomePage/>
         </Layout>
       }/>
+
+
 
 
      <Route path="/login" element={< LoginPage />} />
@@ -141,7 +142,7 @@ export default function App(){
   <Route path="/dashboard" element={<DefaultRedirect/>} />
 
   <Route path="/admin/dashboard" element={
-    <Layout showFooter={false}>
+    <Layout showFooter={false} showNav={false}>
       <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER]}>
         <AdminDashboard/>
       </RoleRoute>
@@ -149,7 +150,7 @@ export default function App(){
   } />
 
       <Route path="/admin/reports" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER]}>
             <ReportsPage />
           </RoleRoute>
@@ -157,7 +158,7 @@ export default function App(){
       } />
 
             <Route path="/admin/setting" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ]}>
             <placeholder title="Settings" owner="You" />
           </RoleRoute>
@@ -165,7 +166,7 @@ export default function App(){
       } />
 
          <Route path="/receptionist/dashboard" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
             <BookingPage />
           </RoleRoute>
@@ -173,8 +174,8 @@ export default function App(){
       } />
 
 
-      <Route path="/receptionist/rooms" element={
-        <Layout showFooter={false}>
+      <Route path="/admin/rooms" element={
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
             <RoomManagement />
           </RoleRoute>
@@ -182,7 +183,7 @@ export default function App(){
       } />
 
       <Route path="/receptionist/bookings" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
             <BookingPage />
           </RoleRoute>
@@ -190,7 +191,7 @@ export default function App(){
       } />
 
       <Route path="/receptionist/checkinout" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
             <CheckInOut />
           </RoleRoute>
@@ -199,7 +200,7 @@ export default function App(){
 
       
       <Route path="/receptionist/billing" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
             < BillingPage />
           </RoleRoute>
@@ -207,7 +208,7 @@ export default function App(){
       } />
 
       <Route path="/housekeeping/dashboard" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.HOUSEKEEPING]}>
             <HousekeepingPage />
           </RoleRoute>
@@ -215,7 +216,7 @@ export default function App(){
       } />
 
             <Route path="/housekeeping/maintenance" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.HOUSEKEEPING]}>
             < MantenanceRequestsPage />
           </RoleRoute>
@@ -223,7 +224,7 @@ export default function App(){
       } />
 
       <Route path="/guest/dashboard" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.GUEST]}>
             <GuestDashboard />
           </RoleRoute>
@@ -231,40 +232,40 @@ export default function App(){
       } />
 
       <Route path="/guest/services" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.GUEST]}>
-            <Placeholder title="Services" owner="Azaan" />
+           <GuestServices/>
           </RoleRoute>
         </Layout>
       } />
-
-            <Route path="/guest/invoice" element={
-        <Layout showFooter={false}>
+            {/* <Route path="/guest/invoice" element={
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.GUEST]}>
             <BillingPage />
           </RoleRoute>
         </Layout>
-      } />
+      } /> */}
 
-            <Route path="/guest/feedback" element={
-        <Layout showFooter={false}>
+            {/* <Route path="/guest/feedback" element={
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.GUEST]}>
             <FeedbackPage />
           </RoleRoute>
         </Layout>
-      } />
+      } /> */}
 
-            <Route path="/profile" element={
-        <Layout showFooter={false}>
-          <PrivateRoute>
-            {/* <ProfilePage/> */}
-            <FeedbackPage/>
-          </PrivateRoute>
+      <Route path="/profile" element={
+        <Layout showFooter={false} showNav={false}>
+          <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.RECEPTIONIST, ROLES.HOUSEKEEPING, ROLES.GUEST]}>
+            {/* <ProfielePag /> */}
+<GuestProfilePage/>
+          </RoleRoute>
         </Layout>
       } />
 
+
             <Route path="/settings" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <PrivateRoute>
             <Placeholder title="Settings" owner="You (Leader)" />
           </PrivateRoute>
@@ -272,31 +273,39 @@ export default function App(){
       } />
 
             <Route path="*" element={
-        <Layout>
+        <Layout showFooter>
           <NotFoundPage />
         </Layout>
       } />
 
     <Route path="/contact" element={
-      <Layout>
+      <Layout showFooter>
         <ContactPage/>
       </Layout>
     } />
 
+
+    <Route path="/gallery" element={
+      <Layout showFooter>
+        <GalleryPage/>
+      </Layout>
+    } />
+
+
       <Route path="/privacypolicy" element={
-      <Layout>
+      <Layout showFooter>
         <PrivacyPolicy/>
       </Layout>
     } />
 
       <Route path="/cookies" element={
-      <Layout>
+      <Layout showFooter>
         <Cookies/>
       </Layout>
     } />
 
           <Route path="/terms" element={
-      <Layout>
+      <Layout showFooter>
         <TermAndServices/>
       </Layout>
     } />
@@ -304,16 +313,18 @@ export default function App(){
 <Route
   path="/rooms"
   element={
-    <Layout>
+    <Layout showFooter>
       <Accommodations />
     </Layout>
   }
 />
 
+
+
 <Route
   path="/rooms/roomexperience"
   element={
-    <Layout>
+    <Layout showFooter>
       <RoomExperience />
     </Layout>
   }
@@ -321,15 +332,34 @@ export default function App(){
 <Route
   path="/PaymentForm"
   element={
-    <Layout>
+    <Layout showFooter>
       <PaymentForm />
     </Layout>
   }
 />
+
 <Route
-  path="/staffmanagement"
+  path="/about"
   element={
-    <Layout>
+    <Layout showFooter>
+      <AboutUsPage />
+    </Layout>
+  }
+/>
+
+<Route
+  path="/amenities"
+  element={
+    <Layout showFooter>
+      <AmenitiesPage />
+    </Layout>
+  }
+/>
+
+<Route
+  path="/admin/staff"
+  element={
+    <Layout showFooter={false} showNav={false}>
       <StaffManagement />
     </Layout>
   }
@@ -346,4 +376,3 @@ element={
     </Routes>
   )
 }
-

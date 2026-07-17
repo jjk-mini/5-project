@@ -7,12 +7,16 @@ import { HashLink } from "react-router-hash-link";
 
 
 
+
 const HOTEL_LINKS = [
   { label: "About us",   path: "/#about" },
   { label: "Our rooms",  path: "/rooms" },
   { label: "Amenities",  path: "/amenities" },
   { label: "Gallery",    path: "/gallery" },
-  { label: "Location",   path: "/location" },
+{
+  label: "Location",
+  path: "https://www.google.com/maps/search/?api=1&query=Burj+Al+Arab+Jumeirah+Dubai",
+}
 ];
 
 const SERVICE_LINKS = [

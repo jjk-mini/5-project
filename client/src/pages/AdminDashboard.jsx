@@ -104,7 +104,7 @@ useEffect(() => {
 
   const dashboardOptions = [
     { label: "Admin Dashboard", path: "/" },
-    { label: "Housekeeping Dashboard", path: "/housekeeping-dashboard" },
+    { label: "Housekeeping Dashboard", path: "/housekeeping/dashboard" },
     { label: "Staff Management Dashboard", path: "/staff-management" },
   ];
 
@@ -139,10 +139,13 @@ useEffect(() => {
         className="flex flex-col md:flex-row min-h-screen"
         style={{ backgroundColor: COLORS.BACKGROUND, fontFamily: FONTS.BODY, color: COLORS.TEXT_PRIMARY }}
       >
-        <AsideBar />
+        <AsideBar 
+        
+        />
         {/* aside end */}
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6"
+        >
 
           {/* Header */}
           <div

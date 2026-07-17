@@ -1,6 +1,7 @@
 // Express app entry point
 require("dotenv").config();
- 
+ const serviceRoutes = require("./routes/serviceRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -46,6 +47,8 @@ app.use("/api/auth", authLimiter);
 
 
 // Routes
+app.use("/api/services", serviceRoutes);
+app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
  // Routes
 // app.use('/api/auth', require('./routes/authRoutes'));
@@ -62,6 +65,7 @@ app.get("/", (req, res) => {
   res.send("LuxuryStay API is running");
 });
  
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });

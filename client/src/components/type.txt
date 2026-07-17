@@ -5,13 +5,13 @@ Amenities
 
 
 
-room services
+room services == done 
 housekeeping 
 transportation
 concierge
 Events
 aboutus
-services
+services == done
 
 location map 
 
