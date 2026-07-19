@@ -1,4 +1,4 @@
-import axiosClient from "./axiosClient";
+import axiosClient from "./AxiosClient";
 
 export const orderApi = {
   create: (data) => axiosClient.post("/orders", data), // { items: [{serviceId, quantity}], specialInstructions }

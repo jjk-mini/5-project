@@ -1,6 +1,7 @@
 // Express app entry point
-require("dotenv").config();
- const serviceRoutes = require("./routes/serviceRoutes");
+const dotenv = require("dotenv");
+dotenv.config();
+const serviceRoutes = require("./routes/serviceRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const express = require("express");
 const cors = require("cors");
@@ -8,12 +9,14 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
- 
+const userRoutes = require("./routes/userRoutes");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
-
+require("./config/cloudinary");
 
 // Connect to MongoDB
+dotenv.config();
+
 connectDB();
  
 const app = express();
@@ -51,12 +54,14 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/auth", authRoutes);
  // Routes
+ app.use('/api/contact', require('./routes/contactRoutes'));
 // app.use('/api/auth', require('./routes/authRoutes'));
-// app.use('/api/rooms', require('./routes/roomRoutes'));
+app.use('/api/rooms', require('./routes/roomRoutes'));
+app.use("/api/staff", require("./routes/staffRoutes"));
 // app.use('/api/bookings', require('./routes/bookingRoutes'));
 // app.use('/api/billing', require('./routes/billingRoutes'));
 // app.use('/api/housekeeping', require('./routes/housekeepingRoutes'));
-// app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 // app.use('/api/feedback', require('./routes/feedbackRoutes'));
 // app.use('/api/reports', require('./routes/reportRoutes'));
 

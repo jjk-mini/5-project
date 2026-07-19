@@ -1,9 +1,25 @@
 const asyncHandler = require("express-async-handler");
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 const Service = require("../models/Service");
+
+// ── HELPER: Upload image buffer to Cloudinary ─────────────────
+const uploadToCloudinary = (buffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: "image" },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.secure_url);
+      }
+    );
+    streamifier.createReadStream(buffer).pipe(stream);
+  });
+};
 
 // @desc    List services — supports ?category=, ?search=, ?curated=true
 // @route   GET /api/services
-// @access  Public (guests browsing while logged in, or public menu preview)
+// @access  Public
 const getServices = asyncHandler(async (req, res) => {
   const filter = {};
 
@@ -52,11 +68,22 @@ const createService = asyncHandler(async (req, res) => {
     throw new Error("Please provide name, description, category, and price");
   }
 
-  // multer-storage-cloudinary attaches the uploaded file's URL to req.file.path
-  const image = req.file ? req.file.path : "";
+  // Upload image to Cloudinary if file is provided
+  let imageUrl = "";
+  if (req.file) {
+    imageUrl = await uploadToCloudinary(req.file.buffer, "luxurystay/services");
+  }
 
   const service = await Service.create({
-    name, description, category, price, rating, eta, status, curated, image,
+    name,
+    description,
+    category,
+    price,
+    rating,
+    eta,
+    status,
+    curated,
+    image: imageUrl,
   });
 
   res.status(201).json(service);
@@ -74,17 +101,18 @@ const updateService = asyncHandler(async (req, res) => {
 
   const { name, description, category, price, rating, eta, status, curated } = req.body;
 
-  service.name = name ?? service.name;
+  service.name        = name        ?? service.name;
   service.description = description ?? service.description;
-  service.category = category ?? service.category;
-  service.price = price ?? service.price;
-  service.rating = rating ?? service.rating;
-  service.eta = eta ?? service.eta;
-  service.status = status ?? service.status;
-  service.curated = curated ?? service.curated;
+  service.category    = category    ?? service.category;
+  service.price       = price       ?? service.price;
+  service.rating      = rating      ?? service.rating;
+  service.eta         = eta         ?? service.eta;
+  service.status      = status      ?? service.status;
+  service.curated     = curated     ?? service.curated;
 
+  // Upload new image to Cloudinary if provided
   if (req.file) {
-    service.image = req.file.path;
+    service.image = await uploadToCloudinary(req.file.buffer, "luxurystay/services");
   }
 
   const updated = await service.save();

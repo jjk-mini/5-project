@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence  } from "framer-motion";
 import {
   HomeModernIcon,
   SunIcon,
@@ -13,52 +13,53 @@ import {
   PaperAirplaneIcon,
 } from "@heroicons/react/24/outline";
 import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
+// import { setMargin } from "recharts/types/state/layoutSlice";
 
 
 
 export const fadeUp = {
-  initial:    { opacity: 0, y: 24 },
-  whileInView:{ opacity: 1, y: 0 },
-  viewport:   { once: true },
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
   transition: { duration: 0.5 },
 };
 
 
 
 export const FEATURES = [
-  { icon: HomeModernIcon,     title: "Quality Rooms",      desc: "A perfect blend of comfort and elegance, designed to provide a relaxing retreat for our guests." },
-  { icon: SunIcon,             title: "Private Beach",      desc: "Relax on our exclusive private beach, where soft sand and calm waters offer the perfect escape." },
+  { icon: HomeModernIcon, title: "Quality Rooms", desc: "A perfect blend of comfort and elegance, designed to provide a relaxing retreat for our guests." },
+  { icon: SunIcon, title: "Private Beach", desc: "Relax on our exclusive private beach, where soft sand and calm waters offer the perfect escape." },
   { icon: BuildingOffice2Icon, title: "Best Accommodation", desc: "Thoughtfully designed rooms equipped with modern amenities and elegant decor." },
-  { icon: SparklesIcon,        title: "Wellness & Spa",     desc: "Rejuvenate your mind and body at our serene wellness spa in a tranquil setting." },
-  { icon: CakeIcon,            title: "Restaurants & Bars", desc: "Savour exquisite cuisine or unwind with a drink at our world-class restaurant and bar." },
-  { icon: GiftIcon,            title: "Special Offers",     desc: "Exclusive deals and packages to dine, shop, and make your stay memorable on a limited basis." },
+  { icon: SparklesIcon, title: "Wellness & Spa", desc: "Rejuvenate your mind and body at our serene wellness spa in a tranquil setting." },
+  { icon: CakeIcon, title: "Restaurants & Bars", desc: "Savour exquisite cuisine or unwind with a drink at our world-class restaurant and bar." },
+  { icon: GiftIcon, title: "Special Offers", desc: "Exclusive deals and packages to dine, shop, and make your stay memorable on a limited basis." },
 ];
 
 
 
 export const ROOMS = [
-  { id: 1, type: "Standard",     roomNo: "Room 101", price: "Rs. 8,000",  guests: 2, amenities: 3, badge: null,       img: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=600&q=80" },
-  { id: 2, type: "Deluxe",       roomNo: "Room 201", price: "Rs. 14,000", guests: 3, amenities: 4, badge: "Popular",  img: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=600&q=80" },
-  { id: 3, type: "Suite",        roomNo: "Room 301", price: "Rs. 22,000", guests: 3, amenities: 4, badge: null,       img: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=600&q=80" },
-  { id: 4, type: "Executive",    roomNo: "Room 401", price: "Rs. 36,000", guests: 4, amenities: 5, badge: null,       img: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=600&q=80" },
-  { id: 5, type: "Presidential", roomNo: "Room 501", price: "Rs. 50,000", guests: 4, amenities: 5, badge: "Premium",  img: "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=600&q=80" },
+  { id: 1, type: "Standard", roomNo: "Room 101", price: "Rs. 8,000", guests: 2, amenities: 3, badge: null, img: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=600&q=80" },
+  { id: 2, type: "Deluxe", roomNo: "Room 201", price: "Rs. 14,000", guests: 3, amenities: 4, badge: "Popular", img: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=600&q=80" },
+  { id: 3, type: "Suite", roomNo: "Room 301", price: "Rs. 22,000", guests: 3, amenities: 4, badge: null, img: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=600&q=80" },
+  { id: 4, type: "Executive", roomNo: "Room 401", price: "Rs. 36,000", guests: 4, amenities: 5, badge: null, img: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=600&q=80" },
+  { id: 5, type: "Presidential", roomNo: "Room 501", price: "Rs. 50,000", guests: 4, amenities: 5, badge: "Premium", img: "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=600&q=80" },
 ];
 
 
 export const TESTIMONIALS = [
-  { name: "Sara Ahmed",   text: "A wonderful experience from start to finish. The ambiance was perfect, and the staff was attentive to every detail.", stars: 5, avatar: "SA" },
-  { name: "Ali Hassan",   text: "Absolutely breathtaking. The Royal Suite exceeded all expectations — impeccable service and stunning views.", stars: 5, avatar: "AH" },
-  { name: "Zara Khan",    text: "From check-in to checkout, every moment was perfect. Truly world class hospitality.", stars: 5, avatar: "ZK" },
+  { name: "Sara Ahmed", text: "A wonderful experience from start to finish. The ambiance was perfect, and the staff was attentive to every detail.", stars: 5, avatar: "SA" },
+  { name: "Ali Hassan", text: "Absolutely breathtaking. The Royal Suite exceeded all expectations — impeccable service and stunning views.", stars: 5, avatar: "AH" },
+  { name: "Zara Khan", text: "From check-in to checkout, every moment was perfect. Truly world class hospitality.", stars: 5, avatar: "ZK" },
 ];
 
 
 export const AMENITIES = [
-  { icon: WifiIcon,          title: "Free WiFi",        desc: "High-speed internet throughout the property" },
-  { icon: SparklesIcon,      title: "Spa & Fitness",    desc: "Rejuvenate with our full service spa and gym" },
-  { icon: SunIcon,            title: "Rooftop Pool",     desc: "Swim in the pool with stunning city views" },
-  { icon: CakeIcon,           title: "Fine Dining",      desc: "World class cuisine served at our restaurant" },
-  { icon: TruckIcon,          title: "Valet Parking",    desc: "Complimentary valet and secure parking" },
-  { icon: PaperAirplaneIcon,  title: "Airport Transfer", desc: "Complimentary pickup and drop service" },
+  { icon: WifiIcon, title: "Free WiFi", desc: "High-speed internet throughout the property" },
+  { icon: SparklesIcon, title: "Spa & Fitness", desc: "Rejuvenate with our full service spa and gym" },
+  { icon: SunIcon, title: "Rooftop Pool", desc: "Swim in the pool with stunning city views" },
+  { icon: CakeIcon, title: "Fine Dining", desc: "World class cuisine served at our restaurant" },
+  { icon: TruckIcon, title: "Valet Parking", desc: "Complimentary valet and secure parking" },
+  { icon: PaperAirplaneIcon, title: "Airport Transfer", desc: "Complimentary pickup and drop service" },
 ];
 
 
@@ -69,7 +70,7 @@ export const AMENITIES = [
 // typography scale, flex/grid) is expressed with Tailwind utility classes.
 
 export const sectionLabel = {
-  color:      COLORS.ACCENT,
+  color: COLORS.ACCENT,
   fontFamily: FONTS.BODY,
 };
 
@@ -79,23 +80,23 @@ export const sectionLine = {
 
 export const sectionTitle = {
   fontFamily: FONTS.HEADING,
-  color:      COLORS.DARK,
+  color: COLORS.DARK,
 };
 
 export const sectionSub = {
   fontFamily: FONTS.BODY,
-  color:      COLORS.TEXT_SECONDARY,
+  color: COLORS.TEXT_SECONDARY,
 };
 
 export const btnPrimary = {
   background: COLORS.PRIMARY,
-  color:      COLORS.CREAM,
+  color: COLORS.CREAM,
   fontFamily: FONTS.BODY,
 };
 
 export const btnOutline = {
-  color:      COLORS.CREAM,
-  border:     "1px solid rgba(248,249,250,0.35)",
+  color: COLORS.CREAM,
+  border: "1px solid rgba(248,249,250,0.35)",
   fontFamily: FONTS.BODY,
 };
 
@@ -103,10 +104,19 @@ const btnPrimaryClass = "inline-block cursor-pointer rounded-md border-none px-[
 const btnOutlineClass = "inline-block cursor-pointer rounded-md bg-transparent px-[26px] py-3 text-[13px] no-underline";
 
 export default function HomePage() {
+  const [slide, setSlide] = useState(0);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [bookingForm, setBookingForm] = useState({
     checkIn: "", checkOut: "", adults: "1 Adult", rooms: "1 Room",
   });
+
+  useEffect(() => {
+  const timer = setInterval(() => {
+    setSlide((s) => (s + 1) % heroSlides.length);
+  }, 6000);
+
+  return () => clearInterval(timer);
+}, [heroSlides.length]);
 
   return (
     <div
@@ -116,50 +126,96 @@ export default function HomePage() {
 
 
 
-{/* hero section */}
-      <section className="relative flex min-h-[90vh] items-center overflow-hidden">
+      {/* hero section */}
+     <section className="relative h-[90vh] overflow-hidden">
+  <AnimatePresence mode="wait">
+    <motion.div
+      key={slide}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8 }}
+      className="absolute inset-0 flex items-center justify-center bg-cover bg-center"
+      style={{
+        backgroundImage: `linear-gradient(rgba(11,11,11,0.55), rgba(11,11,11,0.55)), url(${heroSlides[slide].image})`,
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.2 }}
+        className="text-center px-4"
+      >
+        <p className="text-primary-300 uppercase tracking-[6px] text-sm mb-4">
+          {heroSlides[slide].eyebrow}
+        </p>
 
-       {/* background image */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(to right, rgba(62,47,32,0.85) 40%, rgba(62,47,32,0.4) 100%),
-                         url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1600&q=80')`,
-            backgroundSize:     "cover",
-            backgroundPosition: "center",
-          }}
-        />
+        <h1 className="font-display text-5xl md:text-7xl font-bold text-white mb-6">
+          {heroSlides[slide].title}
+        </h1>
 
-        <div className="relative z-[1] max-w-[680px] px-6 py-16 sm:px-10 md:px-[60px] md:py-20">
-          <motion.div {...fadeUp}>
-            <p className="mb-2 flex items-center gap-2 text-[11px] uppercase tracking-[0.1em]" style={{ ...sectionLabel, color: COLORS.SECONDARY }}>
-              <span className="h-px w-5" style={{ background: COLORS.SECONDARY }} />
-              Elegance Redefined
-            </p>
-            <h1
-              className="m-0 mb-4 text-[clamp(32px,5vw,52px)] font-semibold leading-[1.2] text-white"
-              style={{ fontFamily: FONTS.HEADING }}
-            >
-              Experience<br />Unparalleled Luxury
-            </h1>
-            <p className="m-0 mb-8 max-w-[480px] text-sm font-light leading-[1.8] text-white/65">
-              Indulge yourself with a world-class luxury hotel experience. Every detail is crafted
-              to ensure your stay is nothing short of extraordinary.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/rooms" className={btnPrimaryClass} style={{ background: COLORS.ACCENT, color: COLORS.CREAM, fontFamily: FONTS.BODY }}>
-                Explore Rooms
-              </Link>
-              <Link to="/contact" className={btnOutlineClass} style={btnOutline}>
-                Contact Us
-              </Link>
-            </div>
-          </motion.div>
+        <p className="text-white/80 max-w-xl mx-auto mb-8">
+          {heroSlides[slide].text}
+        </p>
+
+        <div className="flex gap-4 justify-center flex-wrap">
+          <Link to="/rooms" className="btn-primary">
+            Explore Rooms
+          </Link>
+
+          <Link
+            to="/contact"
+            className="btn-outline !text-white !border-white"
+          >
+            Contact Us
+          </Link>
         </div>
-      </section>
+      </motion.div>
+    </motion.div>
+  </AnimatePresence>
+
+  {/* Previous */}
+  <button
+    onClick={() =>
+      setSlide((s) => (s - 1 + heroSlides.length) % heroSlides.length)
+    }
+    className="absolute left-4 top-1/2 -translate-y-1/2 text-white text-3xl z-10 hover:text-primary-300 transition-colors"
+    aria-label="Previous Slide"
+  >
+    <HiChevronLeft />
+  </button>
+
+  {/* Next */}
+  <button
+    onClick={() =>
+      setSlide((s) => (s + 1) % heroSlides.length)
+    }
+    className="absolute right-4 top-1/2 -translate-y-1/2 text-white text-3xl z-10 hover:text-primary-300 transition-colors"
+    aria-label="Next Slide"
+  >
+    <HiChevronRight />
+  </button>
+
+  {/* Dots */}
+  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+    {heroSlides.map((_, i) => (
+      <button
+        key={i}
+        onClick={() => setSlide(i)}
+        className={`w-2.5 h-2.5 rounded-full transition-all ${
+          i === slide
+            ? "bg-primary-400 w-6"
+            : "bg-white/50"
+        }`}
+        aria-label={`Go to Slide ${i + 1}`}
+      />
+    ))}
+  </div>
+</section>
 
 
-{/* bookingform */}
+
+      {/* bookingform */}
       <section className="px-4 sm:px-6 md:px-10" style={{ background: COLORS.SURFACE, boxShadow: SHADOWS.CARD }}>
         <div
           className="flex flex-wrap items-center gap-4 py-5"
@@ -229,7 +285,7 @@ export default function HomePage() {
       </section>
 
 
-{/* about us */}
+      {/* about us */}
       <section id="about" className="px-4 py-14 sm:px-8 md:px-12 lg:px-[60px] lg:py-20">
         <div className="mx-auto grid max-w-[1100px] grid-cols-1 items-center gap-10 md:grid-cols-[1fr_1.1fr] md:gap-[60px]">
 
@@ -274,13 +330,19 @@ export default function HomePage() {
                 <span className="text-[13px]" style={{ color: COLORS.TEXT_BODY, fontFamily: FONTS.BODY }}>{point}</span>
               </div>
             ))}
-            <button className={`${btnPrimaryClass} mt-6`} style={btnPrimary}>Discover More</button>
+            <Link
+              to="/about"
+              className={`${btnPrimaryClass} mt-6`}
+              style={btnPrimary}
+            >
+              Discover More
+            </Link>
           </motion.div>
         </div>
       </section>
 
 
-{/* featurs */}
+      {/* featurs */}
       <section className="px-4 py-14 sm:px-8 md:px-[60px]" style={{ background: COLORS.SURFACE }}>
         <motion.div {...fadeUp} className="mb-10 text-center">
           <p className="mb-2 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.1em]" style={sectionLabel}>
@@ -311,64 +373,12 @@ export default function HomePage() {
 
 
 
-      <section className="px-4 py-14 sm:px-8 md:px-12 lg:px-[60px] lg:py-20">
-        <motion.div {...fadeUp} className="mb-10 text-center">
-          <p className="mb-2 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.1em]" style={sectionLabel}>
-            <span className="h-px w-5" style={sectionLine} />Rooms<span className="h-px w-5" style={sectionLine} />
-          </p>
-          <h2 className="m-0 mb-2.5 text-[28px] font-semibold" style={sectionTitle}>Our Finest Rooms</h2>
-        </motion.div>
-
-        <div className="mx-auto grid max-w-[1100px] grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {ROOMS.map((room, i) => (
-            <motion.div
-              key={room.id}
-              {...fadeUp}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
-              className="overflow-hidden"
-              style={{ background: COLORS.SURFACE, border: `0.5px solid ${COLORS.BORDER}`, borderRadius: BORDER_RADIUS.LG, boxShadow: SHADOWS.CARD }}
-            >
-
-              <div className="relative h-[180px]">
-                <img src={room.img} alt={room.type} className="h-full w-full object-cover" />
-                {room.badge && (
-                  <span
-                    className="absolute left-2.5 top-2.5 px-2.5 py-[3px] text-[10px] font-medium text-white"
-                    style={{ background: COLORS.ACCENT, borderRadius: BORDER_RADIUS.PILL, fontFamily: FONTS.BODY }}
-                  >
-                    {room.badge}
-                  </span>
-                )}
-                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(62,47,32,0.4), transparent)" }} />
-              </div>
-
-              <div className="p-4">
-                <div className="mb-1 flex items-start justify-between">
-                  <h3 className="m-0 text-base" style={sectionTitle}>{room.type}</h3>
-                  <span className="text-sm font-semibold" style={{ color: COLORS.PRIMARY, fontFamily: FONTS.BODY }}>
-                    {room.price}<span className="text-[11px] font-normal" style={{ color: COLORS.TEXT_SECONDARY }}>/night</span>
-                  </span>
-                </div>
-                <p className="m-0 mb-2.5 text-xs" style={{ color: COLORS.TEXT_SECONDARY, fontFamily: FONTS.BODY }}>{room.roomNo}</p>
-                <div className="mb-3.5 flex gap-3">
-                  <span className="text-[11px]" style={{ color: COLORS.TEXT_SECONDARY }}>👤 {room.guests} guests</span>
-                  <span className="text-[11px]" style={{ color: COLORS.TEXT_SECONDARY }}>✨ {room.amenities} amenities</span>
-                </div>
-                <button className={`${btnPrimaryClass} w-full py-2.5 text-center text-xs`} style={btnPrimary}>
-                  View Details
-                </button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
 
 
-
-      <section className="grid grid-cols-1 md:grid-cols-2 md:min-h-[400px]">
+      <section className="grid grid-cols-1 md:grid-cols-2 md:min-h-[400px] m-4">
         <div
-          className="min-h-[260px] md:min-h-[400px]"
-          style={{ background: `url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80') center/cover` }}
+          className="min-h-[260px] md:min-h-[400px] "
+          style={{ background: `url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=800&q=80') center/cover`, }}
         />
 
         <div className="flex flex-col justify-center px-6 py-12 sm:px-10 lg:px-[50px] lg:py-[60px]" style={{ background: COLORS.SURFACE }}>
@@ -408,13 +418,12 @@ export default function HomePage() {
             {[
               {
                 title: "Room Cleaning",
-                price: "$39.99",
                 badge: "Daily",
                 points: ["Daily room cleaning to maintain a fresh and tidy environment", "Schedule your cleaning service at a time that suits your stay", "Professionally friendly cleaning products for your health and safety"],
               },
               {
                 title: "Drinks Included",
-                price: "$59.99",
+
                 badge: "Daily",
                 points: ["A selection of complimentary drinks delivered to your room daily", "Take your drink preferences to our pool bar — included in stay", "Unlimited access to your in-room minibar, refreshed daily"],
               },
@@ -451,7 +460,7 @@ export default function HomePage() {
       </section>
 
 
-{/* testimonial */}
+      {/* testimonial */}
       <section className="px-4 py-14 text-center sm:px-8 md:px-12 lg:px-[60px] lg:py-20" style={{ background: COLORS.SURFACE }}>
         <motion.div {...fadeUp}>
           <p className="mb-2 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.1em]" style={sectionLabel}>
@@ -495,7 +504,7 @@ export default function HomePage() {
       </section>
 
 
-{/* book */}
+      {/* book */}
       <section className="grid grid-cols-1 md:grid-cols-2">
 
         <div className="px-6 py-12 sm:px-10 lg:px-[50px] lg:py-[60px]" style={{ background: COLORS.BACKGROUND }}>
@@ -555,7 +564,7 @@ export default function HomePage() {
       </section>
 
 
-{/* amenities */}
+      {/* amenities */}
       <section className="px-4 py-14 sm:px-8 md:px-[60px]" style={{ background: COLORS.SURFACE }}>
         <motion.div {...fadeUp} className="mb-10 text-center">
           <p className="mb-2 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.1em]" style={sectionLabel}>

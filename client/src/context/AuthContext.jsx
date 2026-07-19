@@ -11,6 +11,16 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+
+      const value = {
+  user,
+  token,
+  loading,
+  login,
+  logout,
+  isAuthenticated: !!user,
+};
+
     const savedToken = localStorage.getItem("token");
     const savedUser  = localStorage.getItem("user");
 
@@ -46,7 +56,7 @@ export const AuthProvider = ({ children }) => {
          isAuthenticated: !!user,
           };
 
-            if (loading) return null;
+            // if (loading) return null;
 
   return (
     <AuthContext.Provider value={value}>

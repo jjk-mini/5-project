@@ -2,6 +2,7 @@ import { FaFacebookF, FaInstagram, FaTwitter, FaLinkedinIn } from "react-icons/f
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
+import { submitContactForm } from "../api/contactApi";
 
 // ── ANIMATION ────────────────────────────────────────────────
 const fadeUp = {
@@ -101,9 +102,17 @@ export default function ContactPage() {
     }
     setLoading(true);
     // Simulate API call — connect to backend later
-    await new Promise((res) => setTimeout(res, 1000));
-    setLoading(false);
-    setSubmitted(true);
+   setLoading(true);
+try {
+  await submitContactForm(formData);
+  setSubmitted(true);
+} catch (err) {
+  setErrors({
+    message: err.response?.data?.message || "Something went wrong. Please try again.",
+  });
+} finally {
+  setLoading(false);
+} 
   };
 
   // ── SHARED STYLES ────────────────────────────────────────

@@ -1,4 +1,4 @@
-import axiosClient from "./axiosClient";
+import axiosClient from "./AxiosClient";
 
 export const serviceApi = {
   getAll: (params) => axiosClient.get("/services", { params }), // { category, search, curated }

@@ -5,17 +5,17 @@ const BillingBanner = ({ booking }) => {
   return (
     <div className="w-full px-1 sm:px-2 lg:px-3 pt-4 sm:pt-6">
       <div
-        // className="
-        //   relative
-        //   w-full
-        // //   h-[220px]
-        // //   sm:h-[260px]
-        // //   md:h-[320px]
-        // //   lg:h-[360px]
-        //   rounded-3xl
-        //   overflow-hidden
-        //   shadow-2xl
-        // "
+        className="
+          relative
+          w-full
+          h-[220px]
+         sm:h-[260px]
+         md:h-[320px]
+          lg:h-[360px]
+          rounded-3xl
+          overflow-hidden
+          shadow-2xl
+        "
       >
         {/* Background Image */}
         <img

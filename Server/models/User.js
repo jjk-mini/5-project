@@ -31,6 +31,72 @@ const userSchema = new mongoose.Schema(
             enum: ROLES,
             default: "guest"
         },
+          
+        profileImage: {
+      type: String,
+      default: "",
+    },
+
+    phone: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+        dateOfBirth: {
+      type: Date,
+      default: null,
+    },
+
+        gender: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+        country: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+     preferredRoomType: {
+      type: String,
+      default: "Deluxe King",
+    },
+
+    preferredLanguage: {
+      type: String,
+      default: "English",
+    },
+
+    emailNotifications: {
+      type: Boolean,
+      default: true,
+    },
+
+    smsNotifications: {
+      type: Boolean,
+      default: false,
+    },
+
+    marketingEmails: {
+      type: Boolean,
+      default: false,
+    },
+
+    // Guest membership
+    loyaltyTier: {
+      type: String,
+      default: "Silver",
+    },
+
+    rewardPoints: {
+      type: Number,
+      default: 0,
+    },
+
+
     },
     {timestamps: true}
 );

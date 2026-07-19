@@ -1,6 +1,4 @@
-// Staff management — list, create, edit, deactivate staffimport React, { useEffect, useState } from "react";
 import AsideBar from "../components/AsideBar";
-import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
 import { Link } from "react-router-dom";
 import {
   UserPlus,
@@ -11,19 +9,25 @@ import {
   BadgeCheck,
   LayoutDashboard,
   ChevronDown,
+  UserCog,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import {
+  getStaff,
+  createStaff,
+  updateStaff,
+  deleteStaff as removeStaff,
+} from "../api/staffApi";
+import Swal from 'sweetalert2'
+import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
 
 const API_URL = "http://localhost:5000/api/staff";
-
-const tint = (hex, alpha = "1A") => `${hex}${alpha}`;
-
 
 function StaffManagement() {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-    const [editId, setEditId] = useState(null);
+  const [editId, setEditId] = useState(null);
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
 
 
@@ -44,13 +48,14 @@ function StaffManagement() {
   const fetchStaff = async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_URL);
-      if (!res.ok) throw new Error("Failed to fetch staff.");
-      const data = await res.json();
-      setStaff(data);
+
+      const res = await getStaff();
+
+      setStaff(res);
       setError("");
+
     } catch (err) {
-      setError(err.message);
+      setError("Failed to fetch staff.");
     } finally {
       setLoading(false);
     }
@@ -68,28 +73,30 @@ function StaffManagement() {
 
     try {
       if (editId !== null) {
-        // Update existing staff member
-        const res = await fetch(`${API_URL}/${editId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        });
-        if (!res.ok) throw new Error("Failed to update staff.");
+        // Update staff
+        await updateStaff(editId, form);
         setEditId(null);
       } else {
-        // Create new staff member
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        });
-        if (!res.ok) throw new Error("Failed to add staff.");
+        // Add new staff
+        await createStaff(form);
       }
 
-      setForm({ name: "", email: "", role: "Receptionist" });
-      fetchStaff(); // refresh list from DB
+      // Clear form
+      setForm({
+        name: "",
+        email: "",
+        role: "Receptionist",
+      });
+
+      // Refresh staff list
+      fetchStaff();
+
     } catch (err) {
-      alert(err.message);
+      console.error(err);
+
+      alert(
+        err.response?.data?.message || "Something went wrong."
+      );
     }
   };
 
@@ -103,129 +110,118 @@ function StaffManagement() {
   };
 
   const deleteStaff = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this staff member?")) return;
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#5C1A2B",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
-      const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete staff.");
-      fetchStaff(); // refresh list from DB
+      await removeStaff(id);
+
+      await Swal.fire({
+        title: "Deleted!",
+        text: "Staff member has been deleted successfully.",
+        icon: "success",
+        confirmButtonColor: "#5C1A2B",
+      });
+
+      fetchStaff();
+
     } catch (err) {
-      alert(err.message);
+      console.error(err);
+
+      Swal.fire({
+        title: "Error!",
+        text: err.response?.data?.message || "Failed to delete staff.",
+        icon: "error",
+        confirmButtonColor: "#5C1A2B",
+      });
     }
   };
-
-    const headingFont = { fontFamily: FONTS.HEADING };
-
-  const today = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-
 
   return (
     <>
       {/* start Component */}
-      <div className="flex min-h-screen bg-[#F5EFE7]">
+      <div style={{ background: COLORS.BACKGROUND, fontFamily: FONTS.BODY }}
+        className="flex min-h-screen">
 
         <AsideBar />
         {/* component */}
         <div className="flex-1 p-4 md:p-8">
 
           {/* Header */}
-         <div
-                     className="p-6 sm:p-8"
-                     style={{
-                       background: `linear-gradient(to right, ${COLORS.PRIMARY}, ${COLORS.DARK})`,
-                       borderRadius: BORDER_RADIUS.LARGE,
-                       boxShadow: SHADOWS.CARD,
-                     }}
-                   >
-                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
-         
-                       <div>
-                         <p className="text-sm font-medium" style={{ color: `${COLORS.CREAM}CC` }}>
-                           Good morning,
-                         </p>
-                         <h1 className="text-2xl sm:text-3xl font-bold text-white mt-1" style={headingFont}>
-                           Admin User
-                         </h1>
-                         <div className="flex items-center gap-3 mt-3">
-                           <span
-                             className="text-xs font-semibold px-3 py-1"
-                             style={{ color: COLORS.PRIMARY, backgroundColor: COLORS.ACCENT, borderRadius: BORDER_RADIUS.PILL }}
-                           >
-                             Admin
-                           </span>
-                           <span className="text-sm" style={{ color: `${COLORS.CREAM}B3` }}>
-                             {today}
-                           </span>
-                         </div>
-                       </div>
-         
-                       {/* Dropdown start */}
-                       <div className="relative w-full sm:w-72">
-                         <button
-                           type="button"
-                           onClick={() => setIsDashboardOpen((prev) => !prev)}
-                           className="w-full flex items-center justify-between gap-2 font-semibold px-5 py-3 transition-colors focus:outline-none"
-                           style={{
-                             backgroundColor: COLORS.SURFACE,
-                             color: COLORS.PRIMARY,
-                             borderRadius: BORDER_RADIUS.MEDIUM,
-                             boxShadow: SHADOWS.DROPDOWN,
-                           }}
-                         >
-                           <span className="flex items-center gap-2">
-                             <LayoutDashboard size={18} />
-                             Select Dashboard
-                           </span>
-                           <ChevronDown
-                             size={18}
-                             className={`transition-transform ${isDashboardOpen ? "rotate-180" : ""}`}
-                           />
-                         </button>
-         
-                         {isDashboardOpen && (
-                           <ul
-                             className="absolute right-0 z-10 mt-2 w-full overflow-hidden"
-                             style={{
-                               backgroundColor: COLORS.SURFACE,
-                               border: `1px solid ${COLORS.BORDER}`,
-                               borderRadius: BORDER_RADIUS.MEDIUM,
-                               boxShadow: SHADOWS.DROPDOWN,
-                             }}
-                           >
-                             {dashboardOptions.map((option) => (
-                               <li key={option.path}>
-                                 <Link
-                                   to={option.path}
-                                   onClick={() => setIsDashboardOpen(false)}
-                                   className="block w-full text-left px-4 py-3 font-medium transition-colors"
-                                   style={{ color: COLORS.PRIMARY }}
-                                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = tint(COLORS.ACCENT, "33"))}
-                                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                                 >
-                                   {option.label}
-                                 </Link>
-                               </li>
-                             ))}
-                           </ul>
-                         )}
-                       </div>
-                       {/* Dropdown end */}
-         
-                     </div>
-                   </div>
-<br></br>
+
+          <div
+            className="mb-8 p-8"
+            style={{
+              background: `linear-gradient(135deg, ${COLORS.PRIMARY}, #3B2D25)`,
+              borderRadius: BORDER_RADIUS.LARGE,
+              boxShadow: SHADOWS.CARD,
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div
+                className="p-4"
+                style={{
+                  backgroundColor: COLORS.ACCENT,
+                  borderRadius: BORDER_RADIUS.LARGE,
+                }}
+              >
+                <UserCog
+                  size={35}
+                  style={{ color: COLORS.PRIMARY }}
+                />
+              </div>
+
+              <div>
+                <h1
+                  className="text-4xl font-bold"
+                  style={{
+                    color: "#fff",
+                    fontFamily: FONTS.HEADING,
+                  }}
+                >
+                  Staff Management
+                </h1>
+
+                <p
+                  className="mt-2"
+                  style={{
+                    color: COLORS.ACCENT,
+                    fontFamily: FONTS.BODY,
+                  }}
+                >
+                  Manage your hotel staff, assign roles, and keep your team organized.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Add Staff Form */}
 
-          <div className="bg-white rounded-3xl shadow-xl border-t-4 border-[#5C1A2B] p-6 md:p-8">
+          <div className="p-6 md:p-8"
+            style={{
+              background: COLORS.SURFACE,
+              borderTop: `4px solid ${COLORS.PRIMARY}`,
+              borderRadius: BORDER_RADIUS.LARGE,
+              boxShadow: SHADOWS.CARD,
+            }}>
 
             <div className="flex items-center gap-2 mb-5">
               <UserPlus size={22} className="text-[#5C1A2B]" />
-              <h2 className="text-xl font-semibold text-[#5C1A2B]">
+              <h2 className="text-xl font-semibold"
+                style={{
+                  color: COLORS.TEXT_PRIMARY,
+                  fontFamily: FONTS.HEADING,
+                }}>
                 {editId !== null ? "Edit Staff Member" : "Add New Staff"}
               </h2>
             </div>
@@ -239,7 +235,12 @@ function StaffManagement() {
                 onChange={(e) =>
                   setForm({ ...form, name: e.target.value })
                 }
-                className="border border-gray-300 rounded-lg p-3 outline-none shadow-sm focus:ring-2 focus:ring-[#5C1A2B] transition"
+                className="p-3 outline-none"
+                style={{
+                  border: `1px solid ${COLORS.BORDER}`,
+                  borderRadius: BORDER_RADIUS.MEDIUM,
+                  background: COLORS.SURFACE,
+                }}
               />
 
               <input
@@ -249,7 +250,12 @@ function StaffManagement() {
                 onChange={(e) =>
                   setForm({ ...form, email: e.target.value })
                 }
-                className="border border-gray-300 rounded-lg p-3 outline-none shadow-sm focus:ring-2 focus:ring-[#5C1A2B] transition"
+                className="p-3 outline-none"
+                style={{
+                  border: `1px solid ${COLORS.BORDER}`,
+                  borderRadius: BORDER_RADIUS.MEDIUM,
+                  background: COLORS.SURFACE,
+                }}
               />
 
               <select
@@ -257,7 +263,12 @@ function StaffManagement() {
                 onChange={(e) =>
                   setForm({ ...form, role: e.target.value })
                 }
-                className="border border-gray-300 rounded-lg p-3 outline-none shadow-sm focus:ring-2 focus:ring-[#5C1A2B] transition"
+                className="p-3 outline-none"
+                style={{
+                  border: `1px solid ${COLORS.BORDER}`,
+                  borderRadius: BORDER_RADIUS.MEDIUM,
+                  background: COLORS.SURFACE,
+                }}
               >
                 <option>Manager</option>
                 <option>Receptionist</option>
@@ -270,7 +281,11 @@ function StaffManagement() {
 
             <button
               onClick={addStaff}
-              className="mt-5 flex items-center gap-2 bg-[#5C1A2B] text-white px-6 py-3 rounded-lg hover:bg-[#7A233A] shadow-md transition-all duration-300"
+              className="mt-5 flex items-center gap-2 text-white px-6 py-3 transition-all duration-300"
+              style={{
+                background: COLORS.PRIMARY,
+                borderRadius: BORDER_RADIUS.MEDIUM,
+              }}
             >
               <UserPlus size={18} />
               {editId !== null ? "Update Staff" : "Add Staff"}
@@ -281,7 +296,12 @@ function StaffManagement() {
 
           {/* Table */}
 
-          <div className="bg-white rounded-3xl shadow-xl mt-8 overflow-hidden">
+          <div className="mt-8 overflow-hidden"
+            style={{
+              background: COLORS.SURFACE,
+              borderRadius: BORDER_RADIUS.LARGE,
+              boxShadow: SHADOWS.CARD,
+            }}>
 
             <div className="flex items-center gap-2 p-6 pb-0">
               <BadgeCheck size={22} className="text-[#5C1A2B]" />
@@ -317,7 +337,10 @@ function StaffManagement() {
                 <div className="hidden md:block overflow-x-auto mt-4">
                   <table className="w-full">
 
-                    <thead className="bg-linear-to-r from-[#5C1A2B] to-[#7A2840] text-white">
+                    <thead style={{
+                      background: COLORS.PRIMARY,
+                      color: "white",
+                    }}>
                       <tr>
                         <th className="p-4 text-left">Name</th>
                         <th className="p-4 text-left">Email</th>
@@ -359,7 +382,11 @@ function StaffManagement() {
                               {/* Edit */}
                               <button
                                 onClick={() => editStaff(member)}
-                                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-300 shadow"
+                                className="flex items-center gap-1.5 text-white px-4 py-2 rounded-lg transition-all duration-300 shadow"
+                                style={{
+                                  background: COLORS.PRIMARY,
+                                  borderRadius: BORDER_RADIUS.MEDIUM,
+                                }}
                               >
                                 <Pencil size={15} />
                                 Edit
@@ -368,7 +395,11 @@ function StaffManagement() {
                               {/* Delete */}
                               <button
                                 onClick={() => deleteStaff(member._id)}
-                                className="flex items-center gap-1.5 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg transition-all duration-300 shadow"
+                                className="flex items-center gap-1.5 text-white px-4 py-2 rounded-lg transition-all duration-300 shadow"
+                                style={{
+                                  background: COLORS.ERROR,
+                                  borderRadius: BORDER_RADIUS.MEDIUM,
+                                }}
                               >
                                 <Trash2 size={15} />
                                 Delete

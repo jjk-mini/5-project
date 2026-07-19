@@ -17,7 +17,7 @@ import {
 
 const PUBLIC_LINKS = [
   { label: "Home", path: "/" },
-  { label: "Rooms", path: "/rooms" },
+  // { label: "Rooms", path: "/rooms" },
   { label: "About", path: "/#about" },
   { label: "Services", path: "/services" },
   { label: "Contact", path: "/contact" },
@@ -27,9 +27,12 @@ const PUBLIC_LINKS = [
 // (admin/manager/receptionist/housekeeping) no longer get links here at
 // all — that navigation now lives entirely in AsideBar.jsx.
 const GUEST_LINKS = [
-  { label: "My Booking", path: "/guest/dashboard" },
-  { label: "Services", path: "/guest/services" },
-  { label: "Invoice", path: "/guest/invoice" },
+  { label: "Home", path: "/" },
+  { label: "About", path: "/#about" },
+  { label: "Services", path: "/services" },
+  { label: "Contact", path: "/contact" },
+  { label: "Gallery", path: "/gallery" },
+  { label: "Rooms", path: "/rooms" },
   { label: "Feedback", path: "/guest/feedback" },
 ];
 
@@ -44,17 +47,6 @@ const NOTIFICATIONS = [
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
-
-// Small shared keyframe + hover-class block used wherever the notification/
-// profile dropdowns can appear, so panels ease in instead of popping.
-const DROPDOWN_ANIM_CSS = `
-  @keyframes navPanelIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .nav-panel { animation: navPanelIn 0.16s ease-out; }
-  .nav-icon-btn:hover { background: rgba(255,255,255,0.1); }
-`;
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
@@ -101,7 +93,6 @@ export default function Navbar() {
   const NotificationBell = ({ dark }) => (
     <div ref={notifRef} style={{ position: "relative" }}>
       <button
-        className="nav-icon-btn"
         onClick={() => { setNotifOpen((p) => !p); setProfileOpen(false); }}
         aria-label="Notifications"
         style={{
@@ -109,11 +100,11 @@ export default function Navbar() {
           width: "38px", height: "38px", borderRadius: "10px",
           display: "flex", alignItems: "center", justifyContent: "center",
           background: "transparent", border: "none", cursor: "pointer",
-          color: dark ? `${COLORS.CREAM}D9` : COLORS.TEXT_SECONDARY,
+          color: dark ? "rgba(243,229,216,0.85)" : COLORS.TEXT_SECONDARY,
           transition: "background 0.15s ease",
         }}
-        onMouseEnter={dark ? undefined : (e) => (e.currentTarget.style.background = COLORS.BACKGROUND)}
-        onMouseLeave={dark ? undefined : (e) => (e.currentTarget.style.background = "transparent")}
+        onMouseEnter={(e) => (e.currentTarget.style.background = dark ? "rgba(255,255,255,0.1)" : COLORS.BACKGROUND)}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
       >
         <BellIcon style={{ width: 20, height: 20 }} />
         {unreadCount > 0 && (
@@ -127,12 +118,12 @@ export default function Navbar() {
       </button>
 
       {notifOpen && (
-        <div className="nav-panel" style={{
+        <div style={{
           position: "absolute", top: "48px", right: 0,
           width: "310px", maxWidth: "calc(100vw - 40px)", background: "#FFFFFF",
           border: `1px solid ${COLORS.BORDER}`,
           borderRadius: "14px",
-          boxShadow: `0 16px 40px ${COLORS.PRIMARY}29`,
+          boxShadow: "0 14px 36px rgba(92,26,43,0.16)",
           zIndex: 1100, overflow: "hidden",
         }}>
           <div style={{
@@ -188,9 +179,6 @@ export default function Navbar() {
   );
 
   // Shared profile avatar + dropdown — used by staff and guest modes.
-  // The avatar's double ring (dark inner + brass outer) echoes the
-  // crest badge in AsideBar's logo mark, so the two components read
-  // as one visual family.
   const ProfileMenu = () => (
     <div ref={profileRef} style={{ position: "relative" }}>
       <button
@@ -201,20 +189,19 @@ export default function Navbar() {
           background: `linear-gradient(135deg, ${COLORS.ACCENT}, ${COLORS.PRIMARY})`,
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: "13px", fontWeight: 600, color: COLORS.CREAM, fontFamily: FONTS.BODY,
-          boxShadow: `0 0 0 2px ${COLORS.PRIMARY}, 0 0 0 3.5px ${COLORS.ACCENT}80`,
-          transition: "box-shadow 0.15s ease",
+          boxShadow: "0 0 0 2px rgba(255,255,255,0.5)",
         }}
       >
         {initials}
       </button>
 
       {profileOpen && (
-        <div className="nav-panel" style={{
+        <div style={{
           position: "absolute", top: "48px", right: 0,
           background: "#FFFFFF",
           border: `1px solid ${COLORS.BORDER}`,
           borderRadius: "14px", width: "230px", maxWidth: "calc(100vw - 40px)",
-          boxShadow: `0 16px 40px ${COLORS.PRIMARY}29`,
+          boxShadow: "0 14px 36px rgba(92,26,43,0.16)",
           zIndex: 1100, overflow: "hidden",
         }}>
           <div style={{
@@ -244,7 +231,7 @@ export default function Navbar() {
               }}>
                 {user?.email || ""}
               </p>
-            </div>
+            </div> 
           </div>
 
           <Link
@@ -287,10 +274,9 @@ export default function Navbar() {
 
   // ══════════════════════════════════════════════════════════════════
   // STAFF MODE — admin / manager / receptionist / housekeeping.
-  // Same burgundy-era brown + brass language as AsideBar, docked flush
-  // beside it, no page links (the sidebar owns those now). The bottom
-  // hairline is brass-tinted rather than plain white, so the corner
-  // where sidebar and topbar meet reads as one continuous frame.
+  // Same burgundy + gold language as AsideBar, docked flush beside it,
+  // no page links (the sidebar owns those now). Just notifications +
+  // profile, on a bar that visually reads as one piece with the sidebar.
   //
   // NOTE: AsideBar is hidden below the `lg` breakpoint for now, and this
   // topbar only reserves sidebar space at `lg` too. Below that there's
@@ -307,7 +293,7 @@ export default function Navbar() {
           "--sidebar-w": `${SIDEBAR_WIDTH}px`,
           height: "64px",
           background: COLORS.PRIMARY,
-          borderBottom: `1px solid ${COLORS.ACCENT}33`,
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
           display: "flex",
           alignItems: "center",
           justifyContent: "flex-end",
@@ -318,7 +304,6 @@ export default function Navbar() {
           zIndex: 1000,
         }}
       >
-        <style>{DROPDOWN_ANIM_CSS}</style>
         <NotificationBell dark />
         <ProfileMenu />
       </header>
@@ -328,8 +313,6 @@ export default function Navbar() {
   // ══════════════════════════════════════════════════════════════════
   // GUEST MODE — logged-in guest. Full top navbar with their own links,
   // same general look as the public navbar, avatar dropdown on the right.
-  // Active links use a brass underline tab (matching AsideBar's key-tab
-  // indicator) instead of a filled pill.
   // ══════════════════════════════════════════════════════════════════
   if (isGuestUser) {
     const linkStyle = (path) => ({
@@ -337,12 +320,12 @@ export default function Navbar() {
       fontSize: "13px",
       color: COLORS.CREAM,
       opacity: isActive(path) ? 1 : 0.72,
-      padding: "9px 2px 7px",
+      padding: "7px 15px",
+      borderRadius: "9px",
       textDecoration: "none",
-      background: "transparent",
-      borderBottom: isActive(path) ? `2px solid ${COLORS.ACCENT}` : "2px solid transparent",
+      background: isActive(path) ? "rgba(243,229,216,0.16)" : "transparent",
       whiteSpace: "nowrap",
-      transition: "opacity 0.15s ease, border-color 0.2s ease",
+      transition: "opacity 0.15s ease, background 0.15s ease",
     });
 
     return (
@@ -354,8 +337,7 @@ export default function Navbar() {
             .nav-links-desktop { display: none; }
             .nav-hamburger { display: flex; }
           }
-          .nav-link:hover { opacity: 1 !important; border-color: ${COLORS.ACCENT}80 !important; }
-          ${DROPDOWN_ANIM_CSS}
+          .nav-link:hover { opacity: 1 !important; background: rgba(243,229,216,0.1) !important; }
         `}</style>
 
         <nav style={{
@@ -371,14 +353,14 @@ export default function Navbar() {
           boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
         }}>
 
-          <Link to="/guest/dashboard" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", marginRight: "36px", flexShrink: 0 }}>
+          <Link to="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", marginRight: "36px", flexShrink: 0 }}>
             <img src={Logo} alt="LuxuryStay Logo" style={{ height: "46px", width: "auto", objectFit: "contain" }} />
             <span style={{ fontFamily: FONTS.HEADING, fontSize: "15px", color: COLORS.ACCENT }}>
               LuxuryStay
             </span>
           </Link>
 
-          <div className="nav-links-desktop" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: "10px" }}>
+          <div className="nav-links-desktop" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: "2px" }}>
             {GUEST_LINKS.map((link) => (
               <HashLink key={link.path} smooth to={link.path} className="nav-link" style={linkStyle(link.path)}>
                 {link.label}
@@ -447,8 +429,7 @@ export default function Navbar() {
   }
 
   // ══════════════════════════════════════════════════════════════════
-  // PUBLIC MODE — logged out visitors. Same brass underline-tab treatment
-  // on active links as guest mode, for one consistent motif site-wide.
+  // PUBLIC MODE — logged out visitors.
   // ══════════════════════════════════════════════════════════════════
   return (
     <>
@@ -461,8 +442,8 @@ export default function Navbar() {
           .nav-auth-desktop { display: none; }
           .nav-hamburger { display: flex; }
         }
-        .nav-link:hover { opacity: 1 !important; border-color: ${COLORS.ACCENT}80 !important; }
-        .btn-login:hover { background: ${COLORS.CREAM}14; }
+        .nav-link:hover { opacity: 1 !important; background: rgba(243,229,216,0.1) !important; }
+        .btn-login:hover { background: rgba(243,229,216,0.08); }
         .btn-register:hover { filter: brightness(1.08); transform: translateY(-1px); }
       `}</style>
 
@@ -486,14 +467,13 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <div className="nav-links-desktop" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: "10px" }}>
+        <div className="nav-links-desktop" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: "2px" }}>
           {PUBLIC_LINKS.map((link) => (
             <HashLink key={link.path} smooth to={link.path} className="nav-link" style={{
               fontFamily: FONTS.BODY, fontSize: "13px", color: COLORS.CREAM,
-              opacity: isActive(link.path) ? 1 : 0.72, padding: "9px 2px 7px",
-              textDecoration: "none", background: "transparent",
-              borderBottom: isActive(link.path) ? `2px solid ${COLORS.ACCENT}` : "2px solid transparent",
-              whiteSpace: "nowrap", transition: "opacity 0.15s ease, border-color 0.2s ease",
+              opacity: isActive(link.path) ? 1 : 0.72, padding: "7px 15px", borderRadius: "9px",
+              textDecoration: "none", background: isActive(link.path) ? "rgba(243,229,216,0.16)" : "transparent",
+              whiteSpace: "nowrap", transition: "opacity 0.15s ease, background 0.15s ease",
             }}>
               {link.label}
             </HashLink>
@@ -503,13 +483,13 @@ export default function Navbar() {
         <div className="nav-auth-desktop" style={{ alignItems: "center", gap: "8px", marginLeft: "auto", flexShrink: 0 }}>
           <Link to="/login" className="btn-login" style={{
             fontFamily: FONTS.BODY, fontSize: "13px", color: COLORS.CREAM, padding: "8px 18px",
-            borderRadius: "9px", border: `1px solid ${COLORS.CREAM}66`, textDecoration: "none",
+            borderRadius: "9px", border: "1px solid rgba(243,229,216,0.4)", textDecoration: "none",
             transition: "background 0.15s ease",
           }}>
             Login
           </Link>
           <Link to="/register" className="btn-register" style={{
-            fontFamily: FONTS.BODY, fontSize: "13px", color: COLORS.PRIMARY, padding: "8px 18px",
+            fontFamily: FONTS.BODY, fontSize: "13px", color: COLORS.TEXT_PRIMARY, padding: "8px 18px",
             borderRadius: "9px", background: COLORS.ACCENT, textDecoration: "none", fontWeight: 500,
             transition: "filter 0.15s ease, transform 0.15s ease",
           }}>

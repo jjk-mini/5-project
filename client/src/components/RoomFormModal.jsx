@@ -10,10 +10,10 @@ const emptyForm = {
   roomNumber: '',
   type: ROOM_TYPES[0],
   price: '',
+  area: '',
   status: ROOM_STATUS.AVAILABLE,
   image: null,
 };
-
 // mode = 'add' | 'edit'
 // room = existing room object (edit mode only)
 // onSave(formValues) is called by the parent to create/update
@@ -24,13 +24,14 @@ const RoomFormModal = ({ mode, room, onClose, onSave, onDelete, saving }) => {
 
   useEffect(() => {
     if (mode === 'edit' && room) {
-      setForm({
-        roomNumber: room.roomNumber || '',
-        type: room.type || ROOM_TYPES[0],
-        price: room.price || '',
-        status: room.status || ROOM_STATUS.AVAILABLE,
-        image: null,
-      });
+setForm({
+  roomNumber: room.roomNumber || '',
+  type: room.type || ROOM_TYPES[0],
+  price: room.price || '',
+  area: room.area || '',
+  status: room.status || ROOM_STATUS.AVAILABLE,
+  image: null,
+});
       setPreview(room.image || null);
     } else {
       setForm(emptyForm);
@@ -94,6 +95,18 @@ const RoomFormModal = ({ mode, room, onClose, onSave, onDelete, saving }) => {
                 required
               />
             </div>
+            <div className="rf-field">
+              
+  <label>Area</label>
+
+  <input
+    name="area"
+    value={form.area}
+    onChange={handleChange}
+    placeholder="e.g. 450 sq ft"
+  />
+</div>
+
             <div className="rf-field">
               <label>Price / Night</label>
               <input

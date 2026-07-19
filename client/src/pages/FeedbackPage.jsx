@@ -1,13 +1,23 @@
 import { useState } from "react";
+import { addFeedback } from "../api/feedbackApi";
+import useAuth from "../hooks/useAuth";
+import Swal from "sweetalert2";
 import {
   Star,
   MessageSquare,
   User,
   CalendarDays,
 } from "lucide-react";
-import AsideBarGuest from "../components/AsidebarGuest";
+
+import {
+  COLORS,
+  FONTS,
+  SHADOWS,
+  BORDER_RADIUS,
+} from "../constants/theme";
 
 function FeedbackPage() {
+  const { user } = useAuth();
 
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
@@ -16,7 +26,7 @@ function FeedbackPage() {
   const reviews = [
     {
       id: 1,
-      guest: "John Smith",
+      guest: "John Doe",
       room: "Deluxe Suite",
       rating: 5,
       comment:
@@ -43,221 +53,313 @@ function FeedbackPage() {
     },
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (rating === 0) {
-      alert("Please select a rating.");
+      Swal.fire({
+        icon: "warning",
+        title: "Rating Required",
+        text: "Please select a rating.",
+      });
       return;
     }
 
     if (comment.trim() === "") {
-      alert("Please enter your feedback.");
+      Swal.fire({
+        icon: "warning",
+        title: "Feedback Required",
+        text: "Please enter your feedback.",
+      });
       return;
     }
 
-    alert("Thank you for your feedback!");
+    try {
+      await addFeedback({
+        guestName: user.name,
+        guestId: user._id,
+        rating,
+        comment,
+        room: "Guest Room",
+      });
 
-    setRating(0);
-    setHover(0);
-    setComment("");
+      setRating(0);
+      setHover(0);
+      setComment("");
+
+      Swal.fire({
+        icon: "success",
+        title: "Thank You!",
+        text: "Your feedback has been submitted successfully.",
+        confirmButtonColor: COLORS.PRIMARY,
+      });
+    } catch (error) {
+      console.error(error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops!",
+        text: "Failed to submit feedback.",
+      });
+    }
   };
 
   return (
-  <div className="min-h-screen bg-[#F5EFE7] flex">
+    <div
+      className="min-h-screen flex"
+      style={{
+        background: COLORS.BACKGROUND,
+        fontFamily: FONTS.BODY,
+      }}
+    >
+      <main className="flex-1 overflow-y-auto p-8">
 
-    {/* Sidebar */}
-    <AsideBarGuest />
+        {/* Header */}
 
-    {/* Main Content */}
-    <main className="flex-1 overflow-y-auto p-8">
-
-      {/* Header */}
-      <div className="bg-linear-to-r from-[#5C1A2B] to-[#7A2840] rounded-3xl shadow-xl p-8 flex flex-col lg:flex-row justify-between items-center mb-8">
-
-        <div>
-
-          <h1 className="text-4xl font-bold text-white">
+        <div
+          className="mb-8 p-8"
+          style={{
+            background: `linear-gradient(135deg, ${COLORS.PRIMARY}, #3B2F28)`,
+            borderRadius: BORDER_RADIUS.LARGE,
+            boxShadow: SHADOWS.CARD,
+          }}
+        >
+          <h1
+            className="text-4xl font-bold"
+            style={{
+              color: COLORS.CREAM,
+              fontFamily: FONTS.HEADING,
+            }}
+          >
             Guest Feedback
           </h1>
 
-          <p className="text-[#F3D89B] mt-2 text-lg">
-            Share your experience and help us improve.
+          <p
+            className="mt-3 text-lg"
+            style={{
+              color: COLORS.ACCENT,
+            }}
+          >
+            Share your experience and help us improve our luxury hospitality.
           </p>
-
         </div>
 
-      </div>
+        <div className="grid lg:grid-cols-2 gap-8">
 
-      {/* Everything below remains exactly the same */}
+          {/* Left Card */}
 
-      <div className="grid lg:grid-cols-2 gap-8">
-
-        {/* Guest Form */}
-
-        <div className="bg-white rounded-3xl shadow-xl border-l-8 border-[#D9B26F] p-8">
-
-          <div className="flex items-center gap-3 mb-8">
-
-            <MessageSquare
-              size={35}
-              className="text-[#5C1A2B]"
-            />
-
-            <h2 className="text-3xl font-bold text-[#5C1A2B]">
-              Leave Feedback
-            </h2>
-
-          </div>
-
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-8"
+          <div
+            className="p-8"
+            style={{
+              background: COLORS.SURFACE,
+              borderRadius: BORDER_RADIUS.LARGE,
+              borderLeft: `8px solid ${COLORS.ACCENT}`,
+              boxShadow: SHADOWS.CARD,
+            }}
           >
-
-            {/* Rating */}
-
-            <div>
-
-              <h3 className="text-lg font-semibold text-[#5C1A2B] mb-4">
-                Rate Your Stay
-              </h3>
-
-              <div className="flex gap-3">
-
-                {[1, 2, 3, 4, 5].map((star) => (
-
-                  <Star
-                    key={star}
-                    size={42}
-                    className={`cursor-pointer transition-all duration-200 ${
-                      star <= (hover || rating)
-                        ? "fill-[#D9B26F] text-[#D9B26F] scale-110"
-                        : "text-gray-300"
-                    }`}
-                    onMouseEnter={() => setHover(star)}
-                    onMouseLeave={() => setHover(0)}
-                    onClick={() => setRating(star)}
-                  />
-
-                ))}
-
-              </div>
-
-            </div>
-
-            {/* Comment */}
-
-            <div>
-
-              <label className="block text-lg font-semibold text-[#5C1A2B] mb-3">
-                Your Feedback
-              </label>
-
-              <textarea
-                rows="7"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Tell us about your experience..."
-                className="w-full rounded-2xl border border-gray-300 p-4 outline-none focus:border-[#5C1A2B]"
+            <div className="flex items-center gap-3 mb-8">
+              <MessageSquare
+                size={35}
+                style={{ color: COLORS.PRIMARY }}
               />
 
+              <h2
+                className="text-3xl font-bold"
+                style={{
+                  color: COLORS.PRIMARY,
+                  fontFamily: FONTS.HEADING,
+                }}
+              >
+                Leave Feedback
+              </h2>
             </div>
 
-            <button
-              type="submit"
-              className="bg-[#5C1A2B] hover:bg-[#7A2840] text-white px-8 py-4 rounded-xl shadow-lg font-semibold transition hover:scale-105"
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-8"
             >
-              Submit Feedback
-            </button>
+              <div>
+                <h3
+                  className="text-lg font-semibold mb-4"
+                  style={{
+                    color: COLORS.TEXT_PRIMARY,
+                  }}
+                >
+                  Rate Your Stay
+                </h3>
 
-          </form>
-
-        </div>
-
-        {/* Admin Reviews */}
-
-        <div className="bg-white rounded-3xl shadow-xl border-l-8 border-[#D9B26F] p-8">
-
-          <h2 className="text-3xl font-bold text-[#5C1A2B] mb-8">
-            Guest Reviews
-          </h2>
-
-          <div className="space-y-6">
-
-            {reviews.map((review) => (
-
-              <div
-                key={review.id}
-                className="bg-[#F5EFE7] rounded-2xl p-6 shadow-sm"
-              >
-
-                <div className="flex justify-between items-start">
-
-                  <div className="flex items-center gap-4">
-
-                    <div className="bg-[#5C1A2B] p-3 rounded-full">
-
-                      <User
-                        size={20}
-                        className="text-[#D9B26F]"
-                      />
-
-                    </div>
-
-                    <div>
-
-                      <h3 className="font-bold text-lg text-[#5C1A2B]">
-                        {review.guest}
-                      </h3>
-
-                      <p className="text-sm text-gray-500">
-                        {review.room}
-                      </p>
-
-                    </div>
-
-                  </div>
-
-                  <div className="flex">
-
-                    {[...Array(review.rating)].map((_, index) => (
-
-                      <Star
-                        key={index}
-                        size={18}
-                        className="fill-[#D9B26F] text-[#D9B26F]"
-                      />
-
-                    ))}
-
-                  </div>
-
+                <div className="flex gap-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      size={42}
+                      onMouseEnter={() => setHover(star)}
+                      onMouseLeave={() => setHover(0)}
+                      onClick={() => setRating(star)}
+                      className="cursor-pointer transition-all duration-300 hover:scale-110"
+                      style={{
+                        fill:
+                          star <= (hover || rating)
+                            ? COLORS.ACCENT
+                            : "transparent",
+                        color:
+                          star <= (hover || rating)
+                            ? COLORS.ACCENT
+                            : "#d1d5db",
+                      }}
+                    />
+                  ))}
                 </div>
-
-                <p className="text-gray-600 mt-5 leading-7">
-                  {review.comment}
-                </p>
-
-                <div className="flex items-center gap-2 mt-5 text-sm text-gray-500">
-
-                  <CalendarDays size={16} />
-
-                  {review.date}
-
-                </div>
-
               </div>
 
-            ))}
+              <div>
+                <label
+                  className="block mb-3 text-lg font-semibold"
+                  style={{
+                    color: COLORS.TEXT_PRIMARY,
+                  }}
+                >
+                  Your Feedback
+                </label>
 
+                <textarea
+                  rows="7"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Tell us about your experience..."
+                  className="w-full p-4 outline-none transition"
+                  style={{
+                    borderRadius: BORDER_RADIUS.MEDIUM,
+                    border: `1px solid ${COLORS.BORDER}`,
+                    color: COLORS.TEXT_PRIMARY,
+                  }}
+                />
+
+                <button
+                  type="submit"
+                  className="mt-6 w-full py-4 text-white font-semibold transition hover:scale-[1.02]"
+                  style={{
+                    background: COLORS.PRIMARY,
+                    borderRadius: BORDER_RADIUS.MEDIUM,
+                    boxShadow: SHADOWS.CARD,
+                  }}
+                >
+                  Submit Feedback
+                </button>
+              </div>
+            </form>
           </div>
 
-        </div>
+          {/* Reviews Card */}
 
-      </div>
+          <div
+            className="p-8"
+            style={{
+              background: COLORS.SURFACE,
+              borderRadius: BORDER_RADIUS.LARGE,
+              borderLeft: `8px solid ${COLORS.ACCENT}`,
+              boxShadow: SHADOWS.CARD,
+            }}
+          >
+            <h2
+              className="text-3xl font-bold mb-8"
+              style={{
+                color: COLORS.PRIMARY,
+                fontFamily: FONTS.HEADING,
+              }}
+            >
+              Guest Reviews
+            </h2>
+
+            <div className="space-y-6"></div>
+
+                          {reviews.map((review) => (
+                <div
+                  key={review.id}
+                  className="p-6"
+                  style={{
+                    background: COLORS.CREAM,
+                    borderRadius: BORDER_RADIUS.LARGE,
+                    boxShadow: SHADOWS.CARD,
+                  }}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-4">
+                      <div
+                        className="p-3 rounded-full"
+                        style={{
+                          background: COLORS.PRIMARY,
+                        }}
+                      >
+                        <User
+                          size={20}
+                          style={{
+                            color: COLORS.ACCENT,
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <h3
+                          className="text-lg font-bold"
+                          style={{
+                            color: COLORS.PRIMARY,
+                            fontFamily: FONTS.HEADING,
+                          }}
+                        >
+                          {review.guest}
+                        </h3>
+
+                        <p
+                          className="text-sm"
+                          style={{
+                            color: COLORS.TEXT_SECONDARY,
+                          }}
+                        >
+                          {review.room}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-1">
+                      {[...Array(review.rating)].map((_, index) => (
+                        <Star
+                          key={index}
+                          size={18}
+                          style={{
+                            fill: COLORS.ACCENT,
+                            color: COLORS.ACCENT,
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <p
+                    className="mt-5 leading-7"
+                    style={{
+                      color: COLORS.TEXT_SECONDARY,
+                    }}
+                  >
+                    {review.comment}
+                  </p>
+
+                  <div
+                    className="flex items-center gap-2 mt-5 text-sm"
+                    style={{
+                      color: COLORS.MUTED,
+                    }}
+                  >
+                    <CalendarDays size={16} />
+                    {review.date}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </main>
-    </div>
+        </div>
+    
   );
 }
 

@@ -1,4 +1,4 @@
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 import AsideBar from "../components/AsideBar";
 import { Link } from "react-router-dom";
 import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
@@ -13,6 +13,10 @@ import {
   ClipboardList,
   BarChart3,
   ArrowRight,
+  Wrench,
+  Hammer,
+  ShieldCheck,
+  BriefcaseBusiness,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -84,28 +88,28 @@ const tint = (hex, alpha = "1A") => `${hex}${alpha}`;
 
 function AdminDashboard() {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false);
-const [recentActivity, setRecentActivity] = useState([]);
-const [activityLoading, setActivityLoading] = useState(true);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [activityLoading, setActivityLoading] = useState(true);
 
-useEffect(() => {
-  const fetchActivity = async () => {
-    setActivityLoading(true);
-    try {
-      const res = await bookingApi.getTodayActivity();
-      setRecentActivity(res.data.activity || res.data.bookings || res.data || []);
-    } catch {
-      setRecentActivity([]);
-    } finally {
-      setActivityLoading(false);
-    }
-  };
-  fetchActivity();
-}, []);
+  useEffect(() => {
+    const fetchActivity = async () => {
+      setActivityLoading(true);
+      try {
+        const res = await bookingApi.getTodayActivity();
+        setRecentActivity(res.data.activity || res.data.bookings || res.data || []);
+      } catch {
+        setRecentActivity([]);
+      } finally {
+        setActivityLoading(false);
+      }
+    };
+    fetchActivity();
+  }, []);
 
   const dashboardOptions = [
     { label: "Admin Dashboard", path: "/" },
-    { label: "Housekeeping Dashboard", path: "/housekeeping/dashboard" },
-    { label: "Staff Management Dashboard", path: "/staff-management" },
+    { label: "Housekeeping Dashboard", path: "/admin/housekeeping-dashboard" },
+    { label: "Staff Management Dashboard", path: "/admin/staff-management" },
   ];
 
   const stats = [
@@ -139,117 +143,82 @@ useEffect(() => {
         className="flex flex-col md:flex-row min-h-screen"
         style={{ backgroundColor: COLORS.BACKGROUND, fontFamily: FONTS.BODY, color: COLORS.TEXT_PRIMARY }}
       >
-        <AsideBar 
-        
-        />
+        <AsideBar />
         {/* aside end */}
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 space-y-6"
-        >
-
+        <main className="flex-1 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 w-full min-w-0">
           {/* Header */}
+
           <div
-            className="p-6 sm:p-8"
+            className="mb-4 sm:mb-8 p-4 sm:p-6 lg:p-8"
             style={{
-              background: `linear-gradient(to right, ${COLORS.PRIMARY}, ${COLORS.DARK})`,
+              background: `linear-gradient(135deg, ${COLORS.PRIMARY}, #3B2D25)`,
               borderRadius: BORDER_RADIUS.LARGE,
               boxShadow: SHADOWS.CARD,
             }}
           >
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
-
-              <div>
-                <p className="text-sm font-medium" style={{ color: `${COLORS.CREAM}CC` }}>
-                  Good morning,
-                </p>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white mt-1" style={headingFont}>
-                  Admin User
-                </h1>
-                <div className="flex items-center gap-3 mt-3">
-                  <span
-                    className="text-xs font-semibold px-3 py-1"
-                    style={{ color: COLORS.PRIMARY, backgroundColor: COLORS.ACCENT, borderRadius: BORDER_RADIUS.PILL }}
-                  >
-                    Admin
-                  </span>
-                  <span className="text-sm" style={{ color: `${COLORS.CREAM}B3` }}>
-                    {today}
-                  </span>
-                </div>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+              <div
+                className="p-3 sm:p-4 shrink-0"
+                style={{
+                  backgroundColor: COLORS.ACCENT,
+                  borderRadius: BORDER_RADIUS.LARGE,
+                }}
+              >
+                <LayoutDashboard
+                  size={28}
+                  className="sm:hidden"
+                  style={{ color: COLORS.PRIMARY }}
+                />
+                <LayoutDashboard
+                  size={35}
+                  className="hidden sm:block"
+                  style={{ color: COLORS.PRIMARY }}
+                />
               </div>
 
-              {/* Dropdown start */}
-              <div className="relative w-full sm:w-72">
-                <button
-                  type="button"
-                  onClick={() => setIsDashboardOpen((prev) => !prev)}
-                  className="w-full flex items-center justify-between gap-2 font-semibold px-5 py-3 transition-colors focus:outline-none"
+              <div className="min-w-0">
+                <h1
+                  className="text-2xl sm:text-3xl lg:text-4xl font-bold break-words"
                   style={{
-                    backgroundColor: COLORS.SURFACE,
-                    color: COLORS.PRIMARY,
-                    borderRadius: BORDER_RADIUS.MEDIUM,
-                    boxShadow: SHADOWS.DROPDOWN,
+                    color: "#fff",
+                    fontFamily: FONTS.HEADING,
                   }}
                 >
-                  <span className="flex items-center gap-2">
-                    <LayoutDashboard size={18} />
-                    Select Dashboard
-                  </span>
-                  <ChevronDown
-                    size={18}
-                    className={`transition-transform ${isDashboardOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+                  Admin Dashboard
+                </h1>
 
-                {isDashboardOpen && (
-                  <ul
-                    className="absolute right-0 z-10 mt-2 w-full overflow-hidden"
-                    style={{
-                      backgroundColor: COLORS.SURFACE,
-                      border: `1px solid ${COLORS.BORDER}`,
-                      borderRadius: BORDER_RADIUS.MEDIUM,
-                      boxShadow: SHADOWS.DROPDOWN,
-                    }}
-                  >
-                    {dashboardOptions.map((option) => (
-                      <li key={option.path}>
-                        <Link
-                          to={option.path}
-                          onClick={() => setIsDashboardOpen(false)}
-                          className="block w-full text-left px-4 py-3 font-medium transition-colors"
-                          style={{ color: COLORS.PRIMARY }}
-                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = tint(COLORS.ACCENT, "33"))}
-                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
-                        >
-                          {option.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <p
+                  className="mt-2 text-sm sm:text-base"
+                  style={{
+                    color: COLORS.ACCENT,
+                    fontFamily: FONTS.BODY,
+                  }}
+                >
+                  Deliver exceptional guest experiences by keeping every room and facility in perfect condition.
+                </p>
               </div>
-              {/* Dropdown end */}
-
             </div>
           </div>
 
           {/* Card start */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
 
             {stats.map(({ label, value, icon: Icon, color }) => (
-              <div key={label} className="p-6" style={cardStyle}>
+              <div key={label} className="p-4 sm:p-6" style={cardStyle}>
                 <div
-                  className="inline-flex items-center justify-center w-11 h-11"
+                  className="inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11"
                   style={{ backgroundColor: tint(color), borderRadius: BORDER_RADIUS.MEDIUM }}
                 >
-                  <Icon size={22} style={{ color }} />
+                  <Icon size={20} className="sm:hidden" style={{ color }} />
+                  <Icon size={22} className="hidden sm:block" style={{ color }} />
                 </div>
 
-                <h1 className="text-3xl font-bold mt-5" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
+                <h1 className="text-2xl sm:text-3xl font-bold mt-4 sm:mt-5" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
                   {value}
                 </h1>
 
-                <p className="mt-1 text-sm" style={{ color: COLORS.TEXT_SECONDARY }}>
+                <p className="mt-1 text-xs sm:text-sm" style={{ color: COLORS.TEXT_SECONDARY }}>
                   {label}
                 </p>
               </div>
@@ -259,15 +228,15 @@ useEffect(() => {
           </div>
 
           {/* Charts start */}
-          <div className="grid xl:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
 
             {/* Occupancy trend (Area chart) */}
-            <div className="p-6" style={cardStyle}>
-              <h2 className="text-lg font-bold mb-6" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
+            <div className="p-4 sm:p-6 min-w-0" style={cardStyle}>
+              <h2 className="text-base sm:text-lg font-bold mb-4 sm:mb-6" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
                 Weekly Occupancy Trend
               </h2>
 
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={220} className="sm:!h-[280px]">
                 <AreaChart data={weeklyOccupancy}>
                   <defs>
                     <linearGradient id="occupancyFill" x1="0" y1="0" x2="0" y2="1">
@@ -297,12 +266,12 @@ useEffect(() => {
             </div>
 
             {/* Room status (Donut chart) */}
-            <div className="p-6" style={cardStyle}>
-              <h2 className="text-lg font-bold mb-6" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
+            <div className="p-4 sm:p-6 min-w-0" style={cardStyle}>
+              <h2 className="text-base sm:text-lg font-bold mb-4 sm:mb-6" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
                 Room Status Breakdown
               </h2>
 
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={220} className="sm:!h-[280px]">
                 <PieChart>
                   <Pie
                     data={roomStatus}
@@ -310,8 +279,8 @@ useEffect(() => {
                     nameKey="name"
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
+                    innerRadius={50}
+                    outerRadius={85}
                     paddingAngle={3}
                   >
                     {roomStatus.map((entry, index) => (
@@ -328,7 +297,7 @@ useEffect(() => {
                       fontFamily: FONTS.BODY,
                     }}
                   />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -337,11 +306,11 @@ useEffect(() => {
           {/* Charts end */}
 
           {/* Quick Actions + Recent Activity start */}
-          <div className="grid xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
 
             {/* Quick Actions */}
-            <div className="p-6" style={cardStyle}>
-              <h2 className="text-lg font-bold mb-4" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
+            <div className="p-4 sm:p-6" style={cardStyle}>
+              <h2 className="text-base sm:text-lg font-bold mb-3 sm:mb-4" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
                 Quick Actions
               </h2>
 
@@ -351,15 +320,15 @@ useEffect(() => {
                     key={label}
                     style={index !== 0 ? { borderTop: `1px solid ${COLORS.BORDER}` } : undefined}
                   >
-                    <Link to={path} className="flex items-center justify-between py-3 group">
+                    <Link to={path} className="flex items-center justify-between py-2.5 sm:py-3 group">
                       <span className="flex items-center gap-3 text-sm font-medium" style={{ color: COLORS.TEXT_PRIMARY }}>
-                        <Icon size={18} style={{ color: COLORS.PRIMARY }} />
+                        <Icon size={18} className="shrink-0" style={{ color: COLORS.PRIMARY }} />
                         {label}
                       </span>
                       <ArrowRight
                         size={16}
                         style={{ color: COLORS.MUTED }}
-                        className="group-hover:translate-x-0.5 transition-transform"
+                        className="shrink-0 group-hover:translate-x-0.5 transition-transform"
                       />
                     </Link>
                   </li>
@@ -368,9 +337,9 @@ useEffect(() => {
             </div>
 
             {/* Recent Activity */}
-            <div className="p-6 xl:col-span-2" style={cardStyle}>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
+            <div className="p-4 sm:p-6 xl:col-span-2 min-w-0" style={cardStyle}>
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h2 className="text-base sm:text-lg font-bold" style={{ color: COLORS.TEXT_PRIMARY, ...headingFont }}>
                   Recent Activity
                 </h2>
                 <span className="text-xs" style={{ color: COLORS.MUTED }}>Today</span>
@@ -380,20 +349,20 @@ useEffect(() => {
                 {recentActivity.map((entry, index) => (
                   <li
                     key={index}
-                    className="flex items-center justify-between py-3 text-sm"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-0 py-3 text-sm"
                     style={index !== 0 ? { borderTop: `1px solid ${COLORS.BORDER}` } : undefined}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-4 min-w-0">
                       <span className="w-12 shrink-0" style={{ color: COLORS.MUTED }}>{entry.time}</span>
                       <span
-                        className="px-2.5 py-1 text-xs font-semibold"
+                        className="px-2.5 py-1 text-xs font-semibold shrink-0"
                         style={{ color: entry.tagColor, backgroundColor: tint(entry.tagColor), borderRadius: BORDER_RADIUS.PILL }}
                       >
                         {entry.tag}
                       </span>
-                      <span className="font-medium" style={{ color: COLORS.TEXT_PRIMARY }}>{entry.name}</span>
+                      <span className="font-medium truncate" style={{ color: COLORS.TEXT_PRIMARY }}>{entry.name}</span>
                     </div>
-                    <span style={{ color: COLORS.MUTED }}>{entry.room}</span>
+                    <span className="shrink-0 pl-14 sm:pl-0" style={{ color: COLORS.MUTED }}>{entry.room}</span>
                   </li>
                 ))}
               </ul>
