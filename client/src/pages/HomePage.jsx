@@ -14,6 +14,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
 // import { setMargin } from "recharts/types/state/layoutSlice";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 
 
 
@@ -35,7 +36,26 @@ export const FEATURES = [
   { icon: GiftIcon, title: "Special Offers", desc: "Exclusive deals and packages to dine, shop, and make your stay memorable on a limited basis." },
 ];
 
-
+export const heroSlides = [
+  {
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80",
+    eyebrow: "Elegance Redefined",
+    title: "Experience Unparalleled Luxury",
+    text: "Immerse yourself in a world where luxury meets comfort. Every detail is crafted to provide an unforgettable experience.",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1600&q=80",
+    eyebrow: "Refined Sophistication",
+    title: "Indulge in Opulence",
+    text: "Step into a realm of exquisite design and superior service. Your perfect escape awaits.",
+  },
+  {
+    image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1600&q=80",
+    eyebrow: "Ultimate Comfort",
+    title: "Luxury Beyond Compare",
+    text: "Experience the pinnacle of luxury living with our world-class amenities and services tailored just for you.",
+  },
+];
 
 export const ROOMS = [
   { id: 1, type: "Standard", roomNo: "Room 101", price: "Rs. 8,000", guests: 2, amenities: 3, badge: null, img: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=600&q=80" },
@@ -110,13 +130,21 @@ export default function HomePage() {
     checkIn: "", checkOut: "", adults: "1 Adult", rooms: "1 Room",
   });
 
-  useEffect(() => {
+ useEffect(() => {
   const timer = setInterval(() => {
     setSlide((s) => (s + 1) % heroSlides.length);
   }, 6000);
 
   return () => clearInterval(timer);
-}, [heroSlides.length]);
+}, []);
+
+useEffect(() => {
+  const timer = setInterval(() => {
+    setActiveTestimonial((t) => (t + 1) % TESTIMONIALS.length);
+  }, 5000);
+
+  return () => clearInterval(timer);
+}, []);
 
   return (
     <div
@@ -216,7 +244,7 @@ export default function HomePage() {
 
 
       {/* bookingform */}
-      <section className="px-4 sm:px-6 md:px-10" style={{ background: COLORS.SURFACE, boxShadow: SHADOWS.CARD }}>
+      {/* <section className="px-4 sm:px-6 md:px-10" style={{ background: COLORS.SURFACE, boxShadow: SHADOWS.CARD }}>
         <div
           className="flex flex-wrap items-center gap-4 py-5"
           style={{ borderBottom: `0.5px solid ${COLORS.BORDER}` }}
@@ -282,7 +310,7 @@ export default function HomePage() {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
 
 
       {/* about us */}
