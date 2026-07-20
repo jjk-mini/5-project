@@ -2,8 +2,29 @@ import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import bookingApi from "../api/bookingApi";
+import { COLORS, FONTS, BORDER_RADIUS, SHADOWS } from "../constants/theme";
 
 const todayStr = () => new Date().toISOString().split("T")[0];
+
+const inputStyle = {
+  width: "100%",
+  marginTop: "6px",
+  padding: "10px 12px",
+  fontSize: "13.5px",
+  borderRadius: BORDER_RADIUS.SMALL,
+  border: `1px solid ${COLORS.BORDER}`,
+  color: COLORS.TEXT_PRIMARY,
+  fontFamily: FONTS.BODY,
+  outline: "none",
+  background: COLORS.BACKGROUND,
+};
+
+const labelStyle = {
+  fontSize: "12px",
+  fontWeight: 500,
+  color: COLORS.TEXT_SECONDARY,
+  fontFamily: FONTS.BODY,
+};
 
 const BookingForm = ({ room, onSuccess }) => {
   const [form, setForm] = useState({
@@ -55,13 +76,31 @@ const BookingForm = ({ room, onSuccess }) => {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       onSubmit={handleSubmit}
-      className="card p-6 space-y-4 sticky top-24"
+      style={{
+        background: COLORS.SURFACE,
+        border: `1px solid ${COLORS.BORDER}`,
+        borderRadius: BORDER_RADIUS.LARGE,
+        boxShadow: SHADOWS.CARD,
+        padding: "22px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+      }}
     >
-      <h3 className="font-display text-xl font-semibold text-primary-700">Book This Room</h3>
+      <h3
+        style={{
+          fontFamily: FONTS.HEADING,
+          fontSize: "19px",
+          color: COLORS.PRIMARY,
+          margin: 0,
+        }}
+      >
+        Book This Room
+      </h3>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
         <div>
-          <label className="text-xs font-medium text-gray-600">Check-in</label>
+          <label style={labelStyle}>Check-in</label>
           <input
             type="date"
             name="checkIn"
@@ -69,11 +108,11 @@ const BookingForm = ({ room, onSuccess }) => {
             value={form.checkIn}
             onChange={handleChange}
             required
-            className="w-full mt-1 rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
+            style={inputStyle}
           />
         </div>
         <div>
-          <label className="text-xs font-medium text-gray-600">Check-out</label>
+          <label style={labelStyle}>Check-out</label>
           <input
             type="date"
             name="checkOut"
@@ -81,52 +120,87 @@ const BookingForm = ({ room, onSuccess }) => {
             value={form.checkOut}
             onChange={handleChange}
             required
-            className="w-full mt-1 rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
+            style={inputStyle}
           />
         </div>
       </div>
 
       <div>
-        <label className="text-xs font-medium text-gray-600">Guests</label>
+        <label style={labelStyle}>Guests</label>
         <input
           type="number"
           name="guestsCount"
           min={1}
-          max={room?.capacity || 10}
+          max={room?.guests || room?.capacity || 10}
           value={form.guestsCount}
           onChange={handleChange}
-          className="w-full mt-1 rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
+          style={inputStyle}
         />
       </div>
 
       <div>
-        <label className="text-xs font-medium text-gray-600">Special Requests</label>
+        <label style={labelStyle}>Special Requests</label>
         <textarea
           name="specialRequests"
           value={form.specialRequests}
           onChange={handleChange}
           rows={3}
-          className="w-full mt-1 rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
+          style={{ ...inputStyle, resize: "vertical" }}
           placeholder="Any preferences, e.g. late check-in, extra pillows..."
         />
       </div>
 
-      <div className="border-t pt-3 space-y-1 text-sm">
-        <div className="flex justify-between text-gray-600">
+      <div
+        style={{
+          borderTop: `1px solid ${COLORS.BORDER}`,
+          paddingTop: "12px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "4px",
+          fontSize: "13.5px",
+          fontFamily: FONTS.BODY,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", color: COLORS.TEXT_SECONDARY }}>
           <span>Rate</span>
-          <span>Rs. {room?.price?.toLocaleString()} / night</span>
+          <span>PKR {Number(room?.price || 0).toLocaleString()} / night</span>
         </div>
-        <div className="flex justify-between text-gray-600">
+        <div style={{ display: "flex", justifyContent: "space-between", color: COLORS.TEXT_SECONDARY }}>
           <span>Nights</span>
           <span>{nights}</span>
         </div>
-        <div className="flex justify-between font-semibold text-dark-900 text-base">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontWeight: 600,
+            fontSize: "15px",
+            color: COLORS.TEXT_PRIMARY,
+            marginTop: "4px",
+          }}
+        >
           <span>Total</span>
-          <span>Rs. {total.toLocaleString()}</span>
+          <span>PKR {total.toLocaleString()}</span>
         </div>
       </div>
 
-      <button type="submit" disabled={loading} className="btn-primary w-full">
+      <button
+        type="submit"
+        disabled={loading}
+        style={{
+          width: "100%",
+          padding: "13px",
+          border: "none",
+          borderRadius: BORDER_RADIUS.MEDIUM,
+          background: COLORS.PRIMARY,
+          color: COLORS.CREAM,
+          fontFamily: FONTS.BODY,
+          fontSize: "14.5px",
+          fontWeight: 600,
+          cursor: loading ? "default" : "pointer",
+          opacity: loading ? 0.7 : 1,
+        }}
+      >
         {loading ? "Booking..." : "Confirm Booking"}
       </button>
     </motion.form>

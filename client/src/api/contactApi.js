@@ -1,4 +1,4 @@
-import axiosClient from "./axiosClient";
+import axiosClient from "./AxiosClient";
 
 export const submitContactForm = async (formData) => {
   const response = await axiosClient.post("/contact", formData);

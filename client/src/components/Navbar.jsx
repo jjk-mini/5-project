@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import notificationApi from "../api/notificationApi";
 import { COLORS, FONTS } from "../constants/theme";
 import { ROLES } from "../constants/roles";
 import { SIDEBAR_WIDTH } from "../constants/layout";
@@ -38,12 +39,18 @@ const GUEST_LINKS = [
 
 const STAFF_ROLES = [ROLES.ADMIN, ROLES.MANAGER, ROLES.RECEPTIONIST, ROLES.HOUSEKEEPING];
 
-// Placeholder — replace with your real notifications source (API/socket).
-const NOTIFICATIONS = [
-  { id: 1, title: "New booking received", detail: "Room 204 · 2 nights", time: "5m ago", read: false },
-  { id: 2, title: "Checkout completed", detail: "Room 118", time: "1h ago", read: false },
-  { id: 3, title: "Maintenance resolved", detail: "Room 302 · A/C", time: "Yesterday", read: true },
-];
+// Turns a createdAt timestamp into "5m ago" / "1h ago" / "Yesterday" style text.
+const timeAgo = (dateStr) => {
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "Yesterday";
+  return `${days}d ago`;
+};
 
 const getInitials = (name = "") =>
   name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -56,12 +63,52 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const profileRef = useRef(null);
   const notifRef = useRef(null);
 
   const initials = getInitials(user?.name);
-  const unreadCount = NOTIFICATIONS.filter((n) => !n.read).length;
+
+  // Real notifications from the backend — fetched on login, then polled
+  // every 30s so the bell stays fresh without needing a socket.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let cancelled = false;
+    const fetchNotifications = async () => {
+      try {
+        const res = await notificationApi.getMine();
+        if (cancelled) return;
+        setNotifications(res.data?.notifications || []);
+        setUnreadCount(res.data?.unreadCount || 0);
+      } catch {
+        // silent — notifications aren't critical enough to show an error banner
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [isAuthenticated]);
+
+  const handleNotifClick = async (n) => {
+    if (!n.read) {
+      setNotifications((prev) => prev.map((x) => (x._id === n._id ? { ...x, read: true } : x)));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+      try {
+        await notificationApi.markAsRead(n._id);
+      } catch {
+        // best-effort — UI already updated optimistically
+      }
+    }
+    if (n.link) navigate(n.link);
+    setNotifOpen(false);
+  };
 
   const isStaff = isAuthenticated && STAFF_ROLES.includes(user?.role);
   const isGuestUser = isAuthenticated && user?.role === ROLES.GUEST;
@@ -142,17 +189,18 @@ export default function Navbar() {
           </div>
 
           <div style={{ maxHeight: "280px", overflowY: "auto" }}>
-            {NOTIFICATIONS.length === 0 ? (
+            {notifications.length === 0 ? (
               <p style={{ padding: "24px 16px", fontSize: "12px", color: COLORS.TEXT_SECONDARY, textAlign: "center", fontFamily: FONTS.BODY }}>
                 You're all caught up.
               </p>
             ) : (
-              NOTIFICATIONS.map((n) => (
-                <div key={n.id} style={{
+              notifications.map((n) => (
+                <div key={n._id} onClick={() => handleNotifClick(n)} style={{
                   padding: "12px 16px",
                   borderBottom: `1px solid ${COLORS.BORDER}`,
                   display: "flex", gap: "10px", alignItems: "flex-start",
                   background: n.read ? "transparent" : COLORS.BACKGROUND,
+                  cursor: "pointer",
                 }}>
                   <div style={{
                     width: "6px", height: "6px", borderRadius: "50%", marginTop: "6px", flexShrink: 0,
@@ -166,7 +214,7 @@ export default function Navbar() {
                       {n.detail}
                     </p>
                     <p style={{ margin: 0, fontSize: "10.5px", color: COLORS.TEXT_SECONDARY, opacity: 0.7 }}>
-                      {n.time}
+                      {timeAgo(n.createdAt)}
                     </p>
                   </div>
                 </div>

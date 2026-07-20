@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom"
+import { Toaster } from "react-hot-toast"
 import { Cloudinary } from '@cloudinary/url-gen';
 import { auto } from '@cloudinary/url-gen/actions/resize';
 import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
@@ -117,10 +118,25 @@ switch (user?.role) {
 
 }
 
+// Staff below manager (receptionist, housekeeping) should only ever see
+// their own dashboard — never the public marketing site. showNav=true
+// marks a public/guest page, so if one of these roles lands on one,
+// bounce them straight to their dashboard.
+const DASHBOARD_ONLY_ROLES = {
+  [ROLES.RECEPTIONIST]: "/receptionist/dashboard",
+  [ROLES.HOUSEKEEPING]: "/housekeeping/dashboard",
+};
+
 // showNav defaults to true — pass showNav={false} on internal/dashboard
 // routes (admin, receptionist, housekeeping, profile, settings, staff) so
 // logged-in users see the sidebar-driven layout without the public navbar.
 function Layout({ children, showFooter, showNav = true }){
+  const { user, isAuthenticated } = useAuth();
+
+  if (showNav && isAuthenticated && DASHBOARD_ONLY_ROLES[user?.role]) {
+    return <Navigate to={DASHBOARD_ONLY_ROLES[user.role]} replace />;
+  }
+
 return(
   <>
   {showNav && <Navbar/>}
@@ -132,7 +148,8 @@ return(
 
 export default function App(){
   return (
-   
+   <>
+   <Toaster position="top-center" toastOptions={{ duration: 3500 }} />
    <Routes>
       <Route path="/" element={
         <Layout showFooter>
@@ -240,7 +257,7 @@ export default function App(){
       } />
 
      <Route path="/receptionist/bookings" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
             <BookingPage />
           </RoleRoute>
@@ -248,7 +265,7 @@ export default function App(){
       } />
 
       <Route path="/receptionist/checkinout" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
             <CheckInOut />
           </RoleRoute>
@@ -257,7 +274,7 @@ export default function App(){
 
       
       <Route path="/receptionist/billing" element={
-        <Layout showFooter={false}>
+        <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
             < BillingPage />
           </RoleRoute>
@@ -474,5 +491,6 @@ element={
 
 
     </Routes>
+   </>
   )
 }

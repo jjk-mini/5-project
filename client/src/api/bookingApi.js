@@ -27,6 +27,11 @@ const bookingApi = {
 
   getTodayActivity: () =>
     axiosClient.get("/bookings/today"),
+
+  // Guest's own currently checked-in bookings — used to build the
+  // room-picker dropdown on the maintenance/service request form.
+  getMyActiveBookings: () =>
+    axiosClient.get("/bookings/mine/active"),
 };
 
 export default bookingApi;

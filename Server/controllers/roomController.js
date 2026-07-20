@@ -61,6 +61,11 @@ const getRoomById = asyncHandler(async (req, res) => {
 
 // POST /api/rooms
 const createRoom = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    res.status(400);
+    throw new Error("Room image is required");
+  }
+
   const {
     roomNumber,
     type,

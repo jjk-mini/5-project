@@ -271,6 +271,7 @@
 import { useState, useEffect } from "react";
 import AsideBar from "../components/AsideBar";
 import { Wrench, Search } from "lucide-react";
+import maintenanceApi from "../api/mainteanceApi";
 import {
   COLORS,
   FONTS,
@@ -280,79 +281,55 @@ import {
 
 function MaintenanceRequestPage() {
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
 
   const [filter, setFilter] = useState("All");
 
+  const loadRequests = async () => {
+    try {
+      const res = await maintenanceApi.getAll();
+      setRequests(res.data || []);
+    } catch {
+      setRequests([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setRequests([
-      {
-        _id: "1",
-        room: {
-          roomNumber: 101,
-          type: "Standard",
-        },
-        issue: "Air Conditioner Not Working",
-        priority: "High",
-        status: "Open",
-      },
-      {
-        _id: "2",
-        room: {
-          roomNumber: 205,
-          type: "Deluxe",
-        },
-        issue: "Water Leakage",
-        priority: "Medium",
-        status: "In Progress",
-      },
-      {
-        _id: "3",
-        room: {
-          roomNumber: 302,
-          type: "Suite",
-        },
-        issue: "Broken TV",
-        priority: "Low",
-        status: "Resolved",
-      },
-      {
-        _id: "4",
-        room: {
-          roomNumber: 405,
-          type: "Presidential",
-        },
-        issue: "Light Not Working",
-        priority: "Medium",
-        status: "Open",
-      },
-    ]);
+    loadRequests();
   }, []);
 
-  const updateStatus = (id) => {
+  const updateStatus = async (id) => {
+    const item = requests.find((r) => r._id === id);
+    if (!item) return;
+
+    let nextStatus = item.status;
+    if (item.status === "Open") nextStatus = "In Progress";
+    else if (item.status === "In Progress") nextStatus = "Resolved";
+
+    // Optimistic update, then confirm with the server
     setRequests((prev) =>
-      prev.map((item) => {
-        if (item._id !== id) return item;
-
-        let status = item.status;
-
-        if (status === "Open") status = "In Progress";
-        else if (status === "In Progress") status = "Resolved";
-
-        return {
-          ...item,
-          status,
-        };
-      })
+      prev.map((r) => (r._id === id ? { ...r, status: nextStatus } : r))
     );
+
+    try {
+      await maintenanceApi.updateStatus(id, nextStatus);
+    } catch {
+      // roll back on failure
+      setRequests((prev) =>
+        prev.map((r) => (r._id === id ? { ...r, status: item.status } : r))
+      );
+    }
   };
 
   const filtered = requests.filter((item) => {
     const roomNumber = item.room?.roomNumber?.toString() || "";
 
     const matchSearch =
-      item.issue.toLowerCase().includes(search.toLowerCase()) ||
+      (item.issueType || "").toLowerCase().includes(search.toLowerCase()) ||
       roomNumber.includes(search);
 
     const matchFilter =
@@ -486,7 +463,15 @@ function MaintenanceRequestPage() {
               </thead>
 
               <tbody>
-                                {filtered.map((item, index) => (
+                                {loading && (
+                  <tr>
+                    <td colSpan={5} className="py-10 text-center" style={{ color: COLORS.TEXT_SECONDARY }}>
+                      Loading maintenance requests...
+                    </td>
+                  </tr>
+                )}
+
+                {!loading && filtered.map((item, index) => (
                   <tr
                     key={item._id}
                     className="transition-all duration-200 hover:bg-amber-50"
@@ -510,7 +495,7 @@ function MaintenanceRequestPage() {
                         color: COLORS.TEXT_SECONDARY,
                       }}
                     >
-                      {item.issue}
+                      {item.issueType}
                     </td>
 
                     <td className="py-5 px-6 text-center">
@@ -585,7 +570,7 @@ function MaintenanceRequestPage() {
                   </tr>
                 ))}
 
-                {filtered.length === 0 && (
+                {!loading && filtered.length === 0 && (
                   <tr>
                     <td
                       colSpan={5}

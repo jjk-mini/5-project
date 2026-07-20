@@ -58,11 +58,13 @@ app.use("/api/auth", authRoutes);
 // app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/rooms', require('./routes/roomRoutes'));
 app.use("/api/staff", require("./routes/staffRoutes"));
-// app.use('/api/bookings', require('./routes/bookingRoutes'));
+app.use('/api/bookings', require('./routes/bookingRoutes'));
+app.use('/api/maintenance', require('./routes/maintenanceRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 // app.use('/api/billing', require('./routes/billingRoutes'));
 // app.use('/api/housekeeping', require('./routes/housekeepingRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
-// app.use('/api/feedback', require('./routes/feedbackRoutes'));
+app.use('/api/feedback', require('./routes/feedbackRoutes'));
 // app.use('/api/reports', require('./routes/reportRoutes'));
 
 // Health check

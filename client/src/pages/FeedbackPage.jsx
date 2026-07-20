@@ -271,9 +271,8 @@ function FeedbackPage() {
               Guest Reviews
             </h2>
 
-            <div className="space-y-6"></div>
-
-                          {reviews.map((review) => (
+            <div className="space-y-6">
+              {reviews.map((review) => (
                 <div
                   key={review.id}
                   className="p-6"
@@ -356,6 +355,8 @@ function FeedbackPage() {
                 </div>
               ))}
             </div>
+
+          </div>
           </div>
         </main>
         </div>

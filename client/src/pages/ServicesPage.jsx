@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AsideBar from "../components/AsideBar";
 import { ConciergeBell, Search } from "lucide-react";
+import { orderApi } from "../api/orderApi";
 import {
   COLORS,
   FONTS,
@@ -9,79 +10,77 @@ import {
 } from "../constants/theme";
 import { Link } from "react-router-dom";
 
+// Backend order status values -> the Pending/In Progress/Completed labels
+// this page already used.
+const STATUS_LABELS = {
+  pending: "Pending",
+  confirmed: "In Progress",
+  delivered: "Completed",
+  cancelled: "Cancelled",
+};
+const NEXT_STATUS = {
+  pending: "confirmed",
+  confirmed: "delivered",
+};
+
 function ServicesPage() {
-  const [services, setServices] = useState([
-    {
-      id: 1,
-      room: 101,
-      service: "Room Cleaning",
-      priority: "High",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      room: 205,
-      service: "Laundry Service",
-      priority: "Medium",
-      status: "In Progress",
-    },
-    {
-      id: 3,
-      room: 302,
-      service: "Fresh Towels",
-      priority: "Low",
-      status: "Completed",
-    },
-    {
-      id: 4,
-      room: 405,
-      service: "Laundry Pickup",
-      priority: "High",
-      status: "Pending",
-    },
-    {
-      id: 5,
-      room: 502,
-      service: "Bed Making",
-      priority: "Medium",
-      status: "Pending",
-    },
-    {
-      id: 6,
-      room: 601,
-      service: "Laundry Delivery",
-      priority: "Low",
-      status: "Completed",
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
 
-  const updateStatus = (id) => {
-    setServices(
-      services.map((item) => {
-        if (item.id !== id) return item;
+  const loadOrders = async () => {
+    try {
+      const res = await orderApi.getAll();
+      setOrders(res.data || []);
+    } catch {
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        let nextStatus = "Completed";
+  useEffect(() => {
+    loadOrders();
+  }, []);
 
-        if (item.status === "Pending")
-          nextStatus = "In Progress";
-        else if (item.status === "In Progress")
-          nextStatus = "Completed";
+  // Flatten each order's line items into individual rows, same shape the
+  // table below expects (room isn't on the order directly — we don't have
+  // a booking link here, so we show the guest's name instead).
+  const services = orders.flatMap((order) =>
+    order.items.map((item, idx) => ({
+      id: `${order._id}-${idx}`,
+      orderId: order._id,
+      guest: order.guest?.name || "Guest",
+      service: item.name,
+      qty: item.quantity,
+      status: STATUS_LABELS[order.status] || order.status,
+      rawStatus: order.status,
+    }))
+  );
 
-        return {
-          ...item,
-          status: nextStatus,
-        };
-      })
+  const updateStatus = async (orderId, rawStatus) => {
+    const next = NEXT_STATUS[rawStatus];
+    if (!next) return;
+
+    setOrders((prev) =>
+      prev.map((o) => (o._id === orderId ? { ...o, status: next } : o))
     );
+
+    try {
+      await orderApi.updateStatus(orderId, next);
+    } catch {
+      setOrders((prev) =>
+        prev.map((o) => (o._id === orderId ? { ...o, status: rawStatus } : o))
+      );
+    }
   };
 
   const filtered = services.filter((item) => {
     const matchSearch =
       item.service.toLowerCase().includes(search.toLowerCase()) ||
-      item.room.toString().includes(search);
+      item.guest.toLowerCase().includes(search.toLowerCase());
 
     const matchFilter =
       filter === "All" || item.status === filter;
@@ -243,7 +242,7 @@ function ServicesPage() {
                       fontWeight: 700,
                     }}
                   >
-                    Room
+                    Guest
                   </th>
 
                   <th
@@ -267,7 +266,7 @@ function ServicesPage() {
                       fontWeight: 700,
                     }}
                   >
-                    Priority
+                    Qty
                   </th>
 
                   <th
@@ -297,7 +296,23 @@ function ServicesPage() {
               </thead>
 
               <tbody>
-                {filtered.map((item, index) => (
+                {loading && (
+                  <tr>
+                    <td colSpan={5} className="py-10 text-center" style={{ color: COLORS.TEXT_SECONDARY }}>
+                      Loading service requests...
+                    </td>
+                  </tr>
+                )}
+
+                {!loading && filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-10 text-center" style={{ color: COLORS.TEXT_SECONDARY }}>
+                      No service requests found.
+                    </td>
+                  </tr>
+                )}
+
+                {!loading && filtered.map((item, index) => (
                   <tr
                     key={item.id}
                     className="transition-all duration-200 hover:bg-amber-50"
@@ -313,7 +328,7 @@ function ServicesPage() {
                         color: COLORS.TEXT_PRIMARY,
                       }}
                     >
-                      #{item.room}
+                      {item.guest}
                     </td>
 
                     <td
@@ -325,27 +340,8 @@ function ServicesPage() {
                       {item.service}
                     </td>
 
-                    <td className="py-5 px-6 text-center">
-                      <span
-                        className="px-4 py-2 rounded-full text-sm font-semibold"
-                        style={{
-                          background:
-                            item.priority === "High"
-                              ? "#FDECEC"
-                              : item.priority === "Medium"
-                              ? "#FFF7E6"
-                              : "#EAF7F0",
-
-                          color:
-                            item.priority === "High"
-                              ? COLORS.ERROR
-                              : item.priority === "Medium"
-                              ? COLORS.WARNING
-                              : COLORS.SUCCESS,
-                        }}
-                      >
-                        {item.priority}
-                      </span>
+                    <td className="py-5 px-6 text-center" style={{ color: COLORS.TEXT_SECONDARY }}>
+                      {item.qty}
                     </td>
 
                     <td className="py-5 px-6 text-center">
@@ -372,9 +368,9 @@ function ServicesPage() {
                     </td>
 
                     <td className="py-5 px-6 text-center">
-                      {item.status !== "Completed" ? (
+                      {item.rawStatus === "pending" || item.rawStatus === "confirmed" ? (
                         <button
-                          onClick={() => updateStatus(item.id)}
+                          onClick={() => updateStatus(item.orderId, item.rawStatus)}
                           className="text-white px-5 py-2 font-medium transition-all duration-200 hover:scale-105"
                           style={{
                             background: COLORS.PRIMARY,
@@ -384,7 +380,7 @@ function ServicesPage() {
                         >
                           Next Status
                         </button>
-                      ) : (
+                      ) : item.rawStatus === "delivered" ? (
                         <span
                           className="px-4 py-2 rounded-full text-sm font-semibold"
                           style={{
@@ -393,6 +389,16 @@ function ServicesPage() {
                           }}
                         >
                           ✓ Completed
+                        </span>
+                      ) : (
+                        <span
+                          className="px-4 py-2 rounded-full text-sm font-semibold"
+                          style={{
+                            background: "#FDECEC",
+                            color: COLORS.ERROR,
+                          }}
+                        >
+                          Cancelled
                         </span>
                       )}
                     </td>

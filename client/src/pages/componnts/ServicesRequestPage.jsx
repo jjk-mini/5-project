@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BellRing,
   ConciergeBell,
@@ -7,6 +7,8 @@ import {
   Wrench 
 } from "lucide-react";
 import ProfileSection from "./ProfileSection";
+import bookingApi from "../../api/bookingApi";
+import maintenanceApi from "../../api/mainteanceApi";
 import {
   COLORS,
   SHADOWS,
@@ -14,20 +16,65 @@ import {
 } from "../../constants/theme";
 
 function ServiceRequestPage() {
- 
 
-  const [service, setService] = useState("Room Cleaning");
+  // Guest's currently checked-in bookings — this is how we know exactly
+  // which room number to attach the request to, even if the guest has
+  // more than one active booking.
+  const [activeBookings, setActiveBookings] = useState([]);
+  const [bookingId, setBookingId] = useState("");
+  const [loadingBookings, setLoadingBookings] = useState(true);
+
+  const [service, setService] = useState("Air Conditioner");
   const [priority, setPriority] = useState("Normal");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = (e) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    const fetchActiveBookings = async () => {
+      try {
+        const res = await bookingApi.getMyActiveBookings();
+        const bookings = res.data?.bookings || [];
+        setActiveBookings(bookings);
+        if (bookings.length === 1) setBookingId(bookings[0]._id);
+      } catch {
+        setActiveBookings([]);
+      } finally {
+        setLoadingBookings(false);
+      }
+    };
+    fetchActiveBookings();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError("");
 
-    alert("Service request submitted successfully!");
+    if (!bookingId) {
+      setSubmitError("Please select which room this request is for.");
+      return;
+    }
 
-    setService("Room Cleaning");
-    setPriority("Normal");
-    setDescription("");
+    setSubmitting(true);
+    try {
+      await maintenanceApi.create({
+        bookingId,
+        issueType: service,
+        description,
+        priority,
+      });
+      setSubmitted(true);
+      setService("Air Conditioner");
+      setPriority("Normal");
+      setDescription("");
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch (err) {
+      setSubmitError(err.response?.data?.message || "Couldn't submit your request. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -45,6 +92,35 @@ function ServiceRequestPage() {
         onSubmit={handleSubmit}
         className="grid gap-5"
       >
+        {/* Room */}
+        <div>
+          <label className="mb-2 flex items-center gap-2 text-sm font-semibold">
+            <ConciergeBell size={16} />
+            Room
+          </label>
+
+          {loadingBookings ? (
+            <p className="text-sm text-gray-500">Loading your rooms...</p>
+          ) : activeBookings.length === 0 ? (
+            <p className="text-sm" style={{ color: COLORS.ERROR }}>
+              You don't have any checked-in room right now, so a maintenance request can't be raised.
+            </p>
+          ) : (
+            <select
+              value={bookingId}
+              onChange={(e) => setBookingId(e.target.value)}
+              className="w-full rounded-xl border p-3"
+            >
+              <option value="" disabled>Select a room</option>
+              {activeBookings.map((b) => (
+                <option key={b._id} value={b._id}>
+                  Room {b.room?.roomNumber} — {b.room?.type}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
         {/* Service */}
         <div>
           <label className="mb-2 flex items-center gap-2 text-sm font-semibold">
@@ -57,14 +133,14 @@ function ServiceRequestPage() {
             onChange={(e) => setService(e.target.value)}
             className="w-full rounded-xl border p-3"
           >
-            <option>Air Conditioner</option>
-            <option>Electricity</option>
-            <option>Water Leakage</option>
-            <option>TV</option>
-            <option>Door Lock</option>
-            <option>Furniture</option>
-            <option>Bathroom</option>
-            <option>Other</option>
+            <option value="Air Conditioner">Air Conditioner</option>
+            <option value="Electricity">Electricity</option>
+            <option value="Water Leakage">Water Leakage</option>
+            <option value="TV">TV</option>
+            <option value="Door Lock">Door Lock</option>
+            <option value="Furniture">Furniture</option>
+            <option value="Bathroom">Bathroom</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
@@ -80,10 +156,10 @@ function ServiceRequestPage() {
             onChange={(e) => setPriority(e.target.value)}
             className="w-full rounded-xl border p-3"
           >
-            <option>Low</option>
-            <option>Normal</option>
-            <option>High</option>
-            <option>Urgent</option>
+            <option value="Low">Low</option>
+            <option value="Normal">Normal</option>
+            <option value="High">High</option>
+            <option value="Urgent">Urgent</option>
           </select>
         </div>
 
@@ -103,17 +179,26 @@ function ServiceRequestPage() {
           />
         </div>
 
+{submitError && (
+  <p className="text-sm" style={{ color: COLORS.ERROR }}>{submitError}</p>
+)}
+{submitted && (
+  <p className="text-sm" style={{ color: COLORS.SUCCESS }}>Request submitted — our team has been notified.</p>
+)}
+
 <button
   type="submit"
+  disabled={submitting || activeBookings.length === 0}
   className="w-full py-4 rounded-xl text-lg font-bold transition-transform hover:-translate-y-0.5"
   style={{
     background: COLORS.PRIMARY,
     color: COLORS.CREAM,
     boxShadow: SHADOWS.CARD,
     fontFamily: FONTS.BODY,
+    opacity: (submitting || activeBookings.length === 0) ? 0.6 : 1,
   }}
 >
-  Submit Service Request
+  {submitting ? "Submitting..." : "Submit Service Request"}
 </button>
       </form>
     </ProfileSection>

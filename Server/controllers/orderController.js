@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Order = require("../models/Orders");
 const Service = require("../models/Service");
+const { notifyRole, notifyUser } = require("../utils/notify");
 
 const { SERVICE_CHARGE_RATE, TAX_RATE } = Order.RATES;
 
@@ -56,6 +57,14 @@ const createOrder = asyncHandler(async (req, res) => {
     total,
   });
 
+  notifyRole({
+    role: "receptionist",
+    title: "New service order",
+    detail: `${orderItems.length} item${orderItems.length !== 1 ? "s" : ""} \u00b7 $${total.toFixed(2)}`,
+    type: "order",
+    link: "/admin/services",
+  });
+
   res.status(201).json(order);
 });
 
@@ -94,6 +103,22 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
   order.status = status;
   const updated = await order.save();
+
+  const guestMessages = {
+    confirmed: "Your order has been confirmed.",
+    delivered: "Your order has been delivered. Enjoy!",
+    cancelled: "Your order was cancelled.",
+  };
+  if (guestMessages[status]) {
+    notifyUser({
+      userId: order.guest,
+      title: guestMessages[status],
+      detail: `Order total $${order.total.toFixed(2)}`,
+      type: "order",
+      link: "/guest/services",
+    });
+  }
+
   res.status(200).json(updated);
 });
 

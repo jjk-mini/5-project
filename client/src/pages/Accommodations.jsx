@@ -939,7 +939,7 @@ transform: "scale(1.05)",
                     </div>
 
                     <Link
-                      to={`/rooms/${room._id}`}
+                      to={`/rooms/experience/${room._id}`}
                       className="flex items-center justify-center gap-2 w-full mt-5 py-3 font-semibold"
                       style={{
                         background:
@@ -1106,7 +1106,7 @@ transform: "scale(1.05)",
       </p>
 
       <Link
-        to="/booking"
+        to="/rooms"
         className="inline-flex items-center gap-3 mt-8 px-8 py-4 text-sm font-semibold rounded-full"
         style={{
           background: COLORS.ACCENT,

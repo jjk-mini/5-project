@@ -1,8 +1,4 @@
 // Axios calls — submit and get feedback
-import axios from "axios";
+import axiosClient from "./AxiosClient";
 
-const API = axios.create({
-  baseURL: "http://localhost:5000/api/feedback",
-});
-
-export const addFeedback = (data) => API.post("/", data);
+export const addFeedback = (data) => axiosClient.post("/feedback", data);
