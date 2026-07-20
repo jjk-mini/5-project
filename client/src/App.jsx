@@ -163,7 +163,7 @@ export default function App(){
      <Route path="/login" element={< LoginPage />} />
     <Route path="/register" element={ <RegisterPAge/> } />
 
-  <Route path="" element={
+  <Route path="/unauthorized" element={
     <Layout>
       <UnauthorizedPage/>
     </Layout>

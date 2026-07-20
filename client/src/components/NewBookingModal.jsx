@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { COLORS, FONTS } from "../constants/theme";
-import bookingApi from "c:/Users/MAHEEN/OneDrive/Desktop/LuxuryStay Hospitality/client/src/api/bookingApi";
+import bookingApi from "../api/bookingApi";
 
 const ROOM_TYPES = [
   "Standard Twin",
