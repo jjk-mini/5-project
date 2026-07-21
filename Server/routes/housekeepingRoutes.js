@@ -1,24 +1,90 @@
 const express = require("express");
-const {
-  getHousekeepingRooms,
-  markRoomClean,
-} = require("../controllers/housekeepingController");
-const { protect, authorizeRoles } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.get(
-  "/rooms",
+const {
   protect,
-  authorizeRoles("admin", "manager", "housekeeping"),
-  getHousekeepingRooms
+  authorizeRoles,
+} = require("../middleware/authMiddleware");
+
+const {
+  getAllHousekeepingRequests,
+  getHousekeepingRequest,
+  createHousekeepingRequest,
+  updateHousekeepingStatus,
+  updateHousekeepingRequest,
+  deleteHousekeepingRequest,
+} = require("../controllers/housekeepingController");
+
+// Get all requests
+router.get(
+  "/",
+  protect,
+  authorizeRoles(
+    "admin",
+    "manager",
+    "housekeeping"
+  ),
+  getAllHousekeepingRequests
 );
 
-router.patch(
-  "/rooms/:id/clean",
+// Get one request
+router.get(
+  "/:id",
   protect,
-  authorizeRoles("admin", "manager", "housekeeping"),
-  markRoomClean
+  authorizeRoles(
+    "admin",
+    "manager",
+    "housekeeping"
+  ),
+  getHousekeepingRequest
+);
+
+// Create request
+router.post(
+  "/",
+  protect,
+  authorizeRoles(
+    "admin",
+    "manager",
+    "housekeeping"
+  ),
+  createHousekeepingRequest
+);
+
+// Update only status
+router.patch(
+  "/:id/status",
+  protect,
+  authorizeRoles(
+    "admin",
+    "manager",
+    "housekeeping"
+  ),
+  updateHousekeepingStatus
+);
+
+// Update complete request
+router.put(
+  "/:id",
+  protect,
+  authorizeRoles(
+    "admin",
+    "manager",
+    "housekeeping"
+  ),
+  updateHousekeepingRequest
+);
+
+// Delete request
+router.delete(
+  "/:id",
+  protect,
+  authorizeRoles(
+    "admin",
+    "manager"
+  ),
+  deleteHousekeepingRequest
 );
 
 module.exports = router;

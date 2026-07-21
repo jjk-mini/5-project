@@ -1,35 +1,240 @@
-// Housekeeping controller — view rooms, mark a room clean/available again
 const asyncHandler = require("express-async-handler");
-const Room = require("../models/Room");
-const { notifyRole } = require("../utils/notify");
 
-// GET /api/housekeeping/rooms
-const getHousekeepingRooms = asyncHandler(async (req, res) => {
-  const rooms = await Room.find().sort({ roomNumber: 1 });
-  res.json({ success: true, rooms });
-});
+const Housekeeping = require("../models/Housekeeping");
 
-// PATCH /api/housekeeping/rooms/:id/clean
-const markRoomClean = asyncHandler(async (req, res) => {
-  const room = await Room.findById(req.params.id);
+// =====================================================
+// GET ALL HOUSEKEEPING SERVICE REQUESTS
+// GET /api/housekeeping
+// =====================================================
 
-  if (!room) {
-    res.status(404);
-    throw new Error("Room not found");
+const getAllHousekeepingRequests = asyncHandler(
+  async (req, res) => {
+    const requests =
+      await Housekeeping.find()
+        .populate(
+          "room",
+          "roomNumber type"
+        )
+        .sort({
+          createdAt: -1,
+        });
+
+    res.status(200).json({
+      success: true,
+      count: requests.length,
+      requests,
+    });
   }
+);
 
-  room.status = "available";
-  await room.save();
+// =====================================================
+// GET SINGLE REQUEST
+// GET /api/housekeeping/:id
+// =====================================================
 
-  notifyRole({
-    role: "receptionist",
-    title: "Room ready",
-    detail: `Room ${room.roomNumber} has been cleaned and is now available`,
-    type: "housekeeping",
-    link: "/receptionist/checkinout",
+const getHousekeepingRequest =
+  asyncHandler(async (req, res) => {
+    const request =
+      await Housekeeping.findById(
+        req.params.id
+      ).populate(
+        "room",
+        "roomNumber type"
+      );
+
+    if (!request) {
+      res.status(404);
+
+      throw new Error(
+        "Housekeeping request not found"
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      request,
+    });
   });
 
-  res.json({ success: true, message: "Room marked as available", room });
-});
+// =====================================================
+// CREATE SERVICE REQUEST
+// POST /api/housekeeping
+// =====================================================
 
-module.exports = { getHousekeepingRooms, markRoomClean };
+const createHousekeepingRequest =
+  asyncHandler(async (req, res) => {
+    const {
+      room,
+      service,
+      priority,
+    } = req.body;
+
+    if (
+      !room ||
+      !service
+    ) {
+      res.status(400);
+
+      throw new Error(
+        "Room and service are required"
+      );
+    }
+
+    const request =
+      await Housekeeping.create({
+        room,
+        service,
+        priority:
+          priority || "Medium",
+        status: "Pending",
+      });
+
+    const populatedRequest =
+      await request.populate(
+        "room",
+        "roomNumber type"
+      );
+
+    res.status(201).json({
+      success: true,
+      message:
+        "Housekeeping request created successfully",
+      request: populatedRequest,
+    });
+  });
+
+// =====================================================
+// UPDATE STATUS
+// PATCH /api/housekeeping/:id/status
+// =====================================================
+
+const updateHousekeepingStatus =
+  asyncHandler(async (req, res) => {
+    const {
+      status,
+    } = req.body;
+
+    const validStatuses = [
+      "Pending",
+      "In Progress",
+      "Completed",
+    ];
+
+    if (
+      !validStatuses.includes(status)
+    ) {
+      res.status(400);
+
+      throw new Error(
+        "Invalid housekeeping status"
+      );
+    }
+
+    const request =
+      await Housekeeping.findByIdAndUpdate(
+        req.params.id,
+
+        {
+          status,
+        },
+
+        {
+          new: true,
+          runValidators: true,
+        }
+      ).populate(
+        "room",
+        "roomNumber type"
+      );
+
+    if (!request) {
+      res.status(404);
+
+      throw new Error(
+        "Housekeeping request not found"
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Housekeeping status updated successfully",
+      request,
+    });
+  });
+
+// =====================================================
+// UPDATE COMPLETE REQUEST
+// PUT /api/housekeeping/:id
+// =====================================================
+
+const updateHousekeepingRequest =
+  asyncHandler(async (req, res) => {
+    const request =
+      await Housekeeping.findByIdAndUpdate(
+        req.params.id,
+
+        req.body,
+
+        {
+          new: true,
+          runValidators: true,
+        }
+      ).populate(
+        "room",
+        "roomNumber type"
+      );
+
+    if (!request) {
+      res.status(404);
+
+      throw new Error(
+        "Housekeeping request not found"
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Housekeeping request updated successfully",
+      request,
+    });
+  });
+
+// =====================================================
+// DELETE REQUEST
+// DELETE /api/housekeeping/:id
+// =====================================================
+
+const deleteHousekeepingRequest =
+  asyncHandler(async (req, res) => {
+    const request =
+      await Housekeeping.findById(
+        req.params.id
+      );
+
+    if (!request) {
+      res.status(404);
+
+      throw new Error(
+        "Housekeeping request not found"
+      );
+    }
+
+    await request.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Housekeeping request deleted successfully",
+    });
+  });
+
+module.exports = {
+  getAllHousekeepingRequests,
+  getHousekeepingRequest,
+  createHousekeepingRequest,
+  updateHousekeepingStatus,
+  updateHousekeepingRequest,
+  deleteHousekeepingRequest,
+};

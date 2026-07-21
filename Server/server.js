@@ -66,6 +66,7 @@ app.use('/api/housekeeping', require('./routes/housekeepingRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/feedback', require('./routes/feedbackRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
+app.use('/api/housekeeping', require('./routes/housekeepingRoutes')); 
 
 // Health check
 app.get("/", (req, res) => {

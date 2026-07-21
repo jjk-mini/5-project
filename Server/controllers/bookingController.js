@@ -3,8 +3,10 @@ const asyncHandler = require("express-async-handler");
 const Booking = require("../models/Booking");
 const Room = require("../models/Room");
 const User = require("../models/User");
+const Housekeeping = require("../models/Housekeeping");
 const { calcNights } = require("../utils/calBill");
 const { notifyUser, notifyRole } = require("../utils/notify");
+
 
 // @desc  Get all bookings (staff) or own bookings (guest)
 // @route GET /api/bookings
@@ -204,10 +206,27 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
       booking.room.status = "occupied";
       await booking.room.save();
     }
-    if (status === "checked-out") {
-      booking.room.status = "cleaning";
-      await booking.room.save();
-    }
+if (status === "checked-out") {
+  booking.room.status = "cleaning";
+  await booking.room.save();
+
+  // Check if an active cleaning request already exists
+  const existingRequest = await Housekeeping.findOne({
+    room: booking.room._id,
+    service: "Room Cleaning",
+    status: { $in: ["Pending", "In Progress"] },
+  });
+
+  // Create automatic housekeeping request
+  if (!existingRequest) {
+    await Housekeeping.create({
+      room: booking.room._id,
+      service: "Room Cleaning",
+      priority: "High",
+      status: "Pending",
+    });
+  }
+}
     if (status === "cancelled") {
       booking.room.status = "available";
       await booking.room.save();
