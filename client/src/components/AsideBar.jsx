@@ -27,13 +27,12 @@ const SIDEBAR_LINKS = {
     { name: "Maintenance", icon: Wrench, path: "/housekeeping/maintenance" },
     { name: "HouseKeeping", icon: ClipboardList, path: "/housekeeping/dashboard" },
     { name: "Rooms", icon: BedDouble, path: "/admin/rooms" },
-    { name: "RequestService", icon: ConciergeBell, path:"/admin/services" },
+    { name: "RequestService", icon: ConciergeBell, path: "/admin/services" },
     { name: "Services", icon: CircleUserRound, path: "/admin/services/catalog" },
     { name: "Bookings", icon: CalendarCheck, path: "/admin/bookings" },
     { name: "Billing", icon: CreditCard, path: "/admin/billing" },
     { name: "Reports", icon: BarChart2, path: "/admin/reports" },
     { name: "Profile", icon: CircleUserRound, path: "/profile" },
-    
   ],
 
   [ROLES.MANAGER]: [
@@ -41,13 +40,9 @@ const SIDEBAR_LINKS = {
     { name: "Staff", icon: UserCog, path: "/admin/staff-management" },
     { name: "Maintenance", icon: Wrench, path: "/housekeeping/maintenance" },
     { name: "Requests", icon: ClipboardList, path: "/housekeeping/dashboard" },
-    // { name: "Rooms", icon: BedDouble, path: "/admin/rooms" },
-    // { name: "Services", icon: ConciergeBell, path: "/admin/services" },
     { name: "Bookings", icon: CalendarCheck, path: "/admin/bookings" },
-        { name: "Billing", icon: CreditCard, path: "/admin/billing" },
-    // { name: "Reports", icon: BarChart2, path: "/admin/reports" },
+    { name: "Billing", icon: CreditCard, path: "/admin/billing" },
     { name: "Profile", icon: CircleUserRound, path: "/profile" },
-    
   ],
 
   [ROLES.RECEPTIONIST]: [
@@ -77,22 +72,30 @@ function AsideBar() {
 
   return (
     <aside
-      className="hidden lg:flex flex-col sticky top-0"
+      className="hidden lg:flex flex-col"
       style={{
         width: SIDEBAR_WIDTH,
         height: "100vh",
         background: COLORS.PRIMARY,
         color: COLORS.CREAM,
         overflow: "hidden",
+        position: "sticky",
+        top: 0,
+        flexShrink: 0,
       }}
     >
-      {/* Logo */}
-      <div className="px-6 py-5 border-b border-white/10">
+      {/* Logo - Fixed at top */}
+      <div 
+        className="flex-shrink-0 px-5 py-5"
+        style={{
+          borderBottom: `1px solid rgba(255,255,255,0.1)`,
+        }}
+      >
         <div className="flex items-center gap-3">
           <img
             src={Logo}
             alt="LuxuryStay Logo"
-            className="w-12 h-12 object-contain"
+            className="w-11 h-11 object-contain"
           />
 
           <div>
@@ -104,7 +107,7 @@ function AsideBar() {
             </h1>
 
             <p
-              className="text-xs mt-1"
+              className="text-[11px] mt-1"
               style={{
                 color: COLORS.ACCENT,
                 fontFamily: FONTS.BODY,
@@ -116,10 +119,17 @@ function AsideBar() {
         </div>
       </div>
 
-      {/* Menu */}
-      <div className="flex-1 px-5 py-5">
+      {/* Menu - No scrolling, all items fit */}
+      <div 
+        className="flex-1 px-4 py-5"
+        style={{
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <p
-          className="text-xs uppercase tracking-widest mb-4"
+          className="text-[11px] uppercase tracking-widest mb-3 flex-shrink-0"
           style={{
             color: "rgba(243,229,216,0.55)",
             fontFamily: FONTS.BODY,
@@ -128,7 +138,14 @@ function AsideBar() {
           Main Menu
         </p>
 
-        <ul className="space-y-2">
+        <ul 
+          className="space-y-1.5"
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           {menuItems.map((item) => {
             const Icon = item.icon;
 
@@ -137,7 +154,7 @@ function AsideBar() {
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                    `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 ${
                       isActive
                         ? ""
                         : "hover:bg-white/10 hover:translate-x-1"
@@ -147,9 +164,10 @@ function AsideBar() {
                     background: isActive ? COLORS.ACCENT : "transparent",
                     color: isActive ? COLORS.PRIMARY : COLORS.CREAM,
                     fontFamily: FONTS.BODY,
+                    fontSize: "14px",
                   })}
                 >
-                  <Icon size={20} />
+                  <Icon size={19} />
 
                   <span className="text-sm font-medium">
                     {item.name}
@@ -161,18 +179,25 @@ function AsideBar() {
         </ul>
       </div>
 
-      {/* Logout */}
-      <div className="mt-auto p-5 border-t border-white/10">
+      {/* Logout - Fixed at bottom */}
+      <div 
+        className="flex-shrink-0 px-4 pb-5 pt-4"
+        style={{
+          borderTop: `1px solid rgba(255,255,255,0.1)`,
+          background: COLORS.PRIMARY,
+        }}
+      >
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold transition-all duration-200 hover:brightness-110"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold transition-all duration-200 hover:brightness-110 hover:scale-105"
           style={{
             background: COLORS.ACCENT,
             color: COLORS.PRIMARY,
             fontFamily: FONTS.BODY,
+            fontSize: "14px",
           }}
         >
-          <LogOut size={18} />
+          <LogOut size={19} />
           Logout
         </button>
       </div>
