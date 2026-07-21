@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { COLORS, FONTS, BORDER_RADIUS, SHADOWS } from "../constants/theme";
 import { serviceApi } from "../api/serviceApi";
 import { orderApi } from "../api/orderApi";
@@ -9,12 +11,20 @@ import {
   Plus,
   Minus,
   X,
-  ChevronLeft,
-  ChevronRight,
   ChevronDown,
   Receipt,
   Info,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
+
+export const fadeUp = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.5 },
+};
 
 const CATEGORIES = [
   "All Services",
@@ -62,9 +72,9 @@ export default function GuestServices() {
 
   const [activeCategory, setActiveCategory] = useState("All Services");
   const [searchTerm, setSearchTerm] = useState("");
-  const [cardQty, setCardQty] = useState({}); // { [serviceId]: number } — per-card stepper before Add
+  const [cardQty, setCardQty] = useState({});
 
-  const [cart, setCart] = useState([]); // [{ serviceId, name, image, price, quantity }]
+  const [cart, setCart] = useState([]);
   const [instructions, setInstructions] = useState("");
   const [placing, setPlacing] = useState(false);
   const [placeError, setPlaceError] = useState("");
@@ -72,10 +82,8 @@ export default function GuestServices() {
 
   const [openFaq, setOpenFaq] = useState(0);
 
-  const catScrollRef = useRef(null);
   const curatedScrollRef = useRef(null);
 
-  // Fetch the main catalog whenever category/search changes
   useEffect(() => {
     const fetchServices = async () => {
       setLoading(true);
@@ -97,7 +105,6 @@ export default function GuestServices() {
     return () => clearTimeout(debounce);
   }, [activeCategory, searchTerm]);
 
-  // Curated carousel fetched once
   useEffect(() => {
     const fetchCurated = async () => {
       try {
@@ -173,9 +180,6 @@ export default function GuestServices() {
     }
   };
 
-  const scrollCats = (dir) => {
-    catScrollRef.current?.scrollBy({ left: dir * 220, behavior: "smooth" });
-  };
   const scrollCurated = (dir) => {
     curatedScrollRef.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
   };
@@ -183,79 +187,204 @@ export default function GuestServices() {
   return (
     <div style={{ background: COLORS.BACKGROUND, fontFamily: FONTS.BODY, color: COLORS.TEXT_PRIMARY }}>
 
-      {/* ── HERO ── */}
-      <section className="relative px-4">
+      {/* ── ENHANCED HERO ── */}
+      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center overflow-hidden">
         <div
-          className="relative overflow-hidden text-center px-6 py-20 sm:py-28"
+          className="absolute inset-0 bg-cover bg-center"
           style={{
-            background: `linear-gradient(to bottom, ${COLORS.DARK}CC, ${COLORS.PRIMARY}E6), url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1600&q=80') center/cover`,
+            backgroundImage: `url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1600&q=80')`,
+            transform: "scale(1.05)",
           }}
-        >
-          <p
-            className="text-xs sm:text-sm font-medium uppercase mb-4"
-            style={{ color: COLORS.ACCENT, letterSpacing: "0.25em", fontFamily: FONTS.BODY }}
-          >
-            Welcome to Excellence
-          </p>
-          <h1
-            className="text-4xl sm:text-6xl mb-4"
-            style={{ fontFamily: FONTS.HEADING, color: COLORS.CREAM }}
-          >
-            At Your <em style={{ color: COLORS.ACCENT, fontStyle: "italic" }}>Service</em>
-          </h1>
-          <div className="w-14 h-px mx-auto mb-6" style={{ background: COLORS.ACCENT }} />
-          <p
-            className="max-w-xl mx-auto text-sm sm:text-base"
-            style={{ color: `${COLORS.CREAM}CC`, lineHeight: 1.8 }}
-          >
-            Discover curated experiences, dining, and amenities designed to elevate your stay.
-            Order directly to your suite.
-          </p>
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `
+              linear-gradient(135deg, rgba(31,26,23,0.95) 0%, rgba(31,26,23,0.7) 40%, rgba(31,26,23,0.4) 70%, rgba(31,26,23,0.15) 100%),
+              linear-gradient(to bottom, rgba(31,26,23,0.3) 0%, transparent 30%, transparent 60%, rgba(31,26,23,0.6) 100%)
+            `
+          }}
+        />
+
+        <div className="absolute top-0 left-0 w-2/5 h-px" style={{ background: `linear-gradient(to right, ${COLORS.ACCENT}, transparent)` }} />
+        <div className="absolute bottom-0 right-0 w-1/4 h-px" style={{ background: `linear-gradient(to left, ${COLORS.ACCENT}, transparent)` }} />
+
+        <div className="relative z-10 w-full container mx-auto px-6 md:px-12">
+          <div className="max-w-3xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <p
+                className="inline-flex items-center gap-3 px-4 py-2 text-[11px] uppercase tracking-[0.15em] rounded-full"
+                style={{
+                  color: COLORS.ACCENT,
+                  fontFamily: FONTS.BODY,
+                  background: `rgba(212, 168, 130, 0.15)`,
+                  border: `1px solid rgba(212, 168, 130, 0.2)`,
+                  backdropFilter: "blur(10px)",
+                }}
+              >
+                <span className="h-px w-4" style={{ background: COLORS.ACCENT }} />
+                Welcome to Excellence
+                <span className="h-px w-4" style={{ background: COLORS.ACCENT }} />
+              </p>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mt-6 mb-4 text-5xl md:text-6xl lg:text-7xl font-light leading-[1.15]"
+              style={{
+                fontFamily: FONTS.HEADING,
+                color: COLORS.CREAM,
+                letterSpacing: "-0.03em",
+                textShadow: "0 2px 20px rgba(0,0,0,0.2)"
+              }}
+            >
+              At Your <br />
+              <span style={{ color: COLORS.ACCENT }}>Service</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="max-w-xl text-base md:text-lg font-light leading-[1.8]"
+              style={{
+                color: "rgba(248,246,243,0.85)",
+                textShadow: "0 1px 12px rgba(0,0,0,0.15)"
+              }}
+            >
+              Discover curated experiences, dining, and amenities designed to elevate your stay.
+              Order directly to your suite.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-8 flex flex-wrap items-center gap-6"
+            >
+              <div className="flex items-center gap-6">
+                <div>
+                  <p className="text-2xl font-light" style={{ color: COLORS.CREAM }}>
+                    {services.length || 0}
+                  </p>
+                  <p className="text-xs uppercase tracking-[0.15em]" style={{ color: "rgba(248,246,243,0.5)" }}>
+                    Services
+                  </p>
+                </div>
+                <div className="w-px h-10" style={{ background: "rgba(248,246,243,0.15)" }} />
+                <div>
+                  <p className="text-2xl font-light" style={{ color: COLORS.CREAM }}>
+                    {CATEGORIES.length}
+                  </p>
+                  <p className="text-xs uppercase tracking-[0.15em]" style={{ color: "rgba(248,246,243,0.5)" }}>
+                    Categories
+                  </p>
+                </div>
+                <div className="w-px h-10" style={{ background: "rgba(248,246,243,0.15)" }} />
+                <div>
+                  <p className="text-2xl font-light" style={{ color: COLORS.ACCENT }}>
+                    24/7
+                  </p>
+                  <p className="text-xs uppercase tracking-[0.15em]" style={{ color: "rgba(248,246,243,0.5)" }}>
+                    Availability
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
 
-        {/* Search + category pills — floating card, overlaps hero bottom edge */}
-        <div
-          className="relative z-10 -mt-10 sm:-mt-12 max-w-4xl mx-auto p-4 sm:p-6"
-          style={{ background: COLORS.SURFACE, borderRadius: BORDER_RADIUS.LARGE, boxShadow: SHADOWS.CARD }}
+        {/* Scroll Indicator */}
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
         >
-          <div
-            className="flex items-center gap-3 px-4 py-3 mb-4"
-            style={{ border: `1px solid ${COLORS.BORDER}`, borderRadius: BORDER_RADIUS.MEDIUM, background: COLORS.BACKGROUND }}
+          <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: "rgba(248,246,243,0.2)" }}>
+            Scroll
+          </span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="w-px h-8"
+            style={{ background: `linear-gradient(to bottom, ${COLORS.ACCENT}, transparent)` }}
+          />
+        </motion.div>
+      </section>
+
+      {/* ── SEARCH + CATEGORY PILLS ── */}
+      <section className="relative z-20 px-4 sm:px-8 md:px-12 lg:px-[60px] -mt-16 md:-mt-20">
+        <div className="mx-auto max-w-6xl">
+          <motion.div
+            {...fadeUp}
+            className="p-6 md:p-8 transition-all duration-300 hover:shadow-xl"
+            style={{
+              background: COLORS.SURFACE,
+              borderRadius: BORDER_RADIUS.LARGE,
+              boxShadow: SHADOWS.CARD,
+              border: `1px solid ${COLORS.BORDER}`,
+            }}
           >
-            <Search size={18} style={{ color: COLORS.MUTED }} />
-            <input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search for services, food, amenities..."
-              className="flex-1 bg-transparent outline-none text-sm"
-              style={{ color: COLORS.TEXT_PRIMARY, fontFamily: FONTS.BODY }}
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => scrollCats(-1)}
-              aria-label="Scroll categories left"
-              className="hidden sm:flex items-center justify-center w-7 h-7 rounded-full flex-shrink-0"
-              style={{ border: `1px solid ${COLORS.BORDER}`, color: COLORS.TEXT_SECONDARY }}
+            <div
+              className="flex items-center gap-3 px-4 py-3 mb-5"
+              style={{
+                border: `2px solid ${COLORS.BORDER}`,
+                borderRadius: BORDER_RADIUS.MEDIUM,
+                background: COLORS.BACKGROUND,
+              }}
             >
-              <ChevronLeft size={14} />
-            </button>
+              <Search size={18} style={{ color: COLORS.MUTED }} />
+              <input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search for services, food, amenities..."
+                className="flex-1 bg-transparent outline-none text-sm"
+                style={{ color: COLORS.TEXT_PRIMARY, fontFamily: FONTS.BODY }}
+                onFocus={(e) => {
+                  e.currentTarget.parentElement.style.borderColor = COLORS.ACCENT;
+                  e.currentTarget.parentElement.style.boxShadow = `0 0 0 4px rgba(212, 168, 130, 0.1)`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.parentElement.style.borderColor = COLORS.BORDER;
+                  e.currentTarget.parentElement.style.boxShadow = "none";
+                }}
+              />
+            </div>
 
-            <div ref={catScrollRef} className="flex gap-2 overflow-x-auto scroll-smooth" style={{ scrollbarWidth: "thin" }}>
+            <div className="flex flex-wrap gap-2 justify-center">
               {CATEGORIES.map((cat) => {
                 const isActive = activeCategory === cat;
                 return (
                   <button
                     key={cat}
                     onClick={() => setActiveCategory(cat)}
-                    className="flex-shrink-0 px-4 py-2 text-sm font-medium transition-colors"
+                    className="px-6 py-3 text-sm font-medium transition-all duration-300"
                     style={{
                       background: isActive ? COLORS.PRIMARY : COLORS.BACKGROUND,
                       color: isActive ? COLORS.CREAM : COLORS.TEXT_SECONDARY,
                       border: `1px solid ${isActive ? COLORS.PRIMARY : COLORS.BORDER}`,
                       borderRadius: BORDER_RADIUS.PILL,
                       fontFamily: FONTS.BODY,
+                      transform: isActive ? "scale(1.05)" : "scale(1)",
+                      boxShadow: isActive ? `0 2px 16px rgba(92,26,43,0.25)` : "none",
+                      minWidth: "100px",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.transform = "scale(1.05)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.transform = "scale(1)";
+                      }
                     }}
                   >
                     {cat}
@@ -263,21 +392,12 @@ export default function GuestServices() {
                 );
               })}
             </div>
-
-            <button
-              onClick={() => scrollCats(1)}
-              aria-label="Scroll categories right"
-              className="hidden sm:flex items-center justify-center w-7 h-7 rounded-full flex-shrink-0"
-              style={{ border: `1px solid ${COLORS.BORDER}`, color: COLORS.TEXT_SECONDARY }}
-            >
-              <ChevronRight size={14} />
-            </button>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── MAIN: catalog + cart sidebar ── */}
-      <section className="px-4 sm:px-6 lg:px-10 py-10 sm:py-14">
+      <section id="services" className="px-4 sm:px-6 lg:px-10 py-10 sm:py-14">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-[1fr_340px] gap-8 items-start">
 
           {/* Catalog */}
@@ -334,7 +454,7 @@ export default function GuestServices() {
 
           {/* Cart sidebar */}
           <aside
-            className="lg:sticky lg:top-6 p-5"
+            className="lg:sticky lg:top-6 p-5 transition-all duration-300 hover:shadow-xl"
             style={{ background: COLORS.SURFACE, borderRadius: BORDER_RADIUS.LARGE, boxShadow: SHADOWS.CARD, border: `1px solid ${COLORS.BORDER}` }}
           >
             <div className="flex items-center gap-2.5 mb-1">
@@ -353,7 +473,11 @@ export default function GuestServices() {
             </p>
 
             {placedOrder ? (
-              <div className="text-center py-8">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-8"
+              >
                 <div
                   className="w-12 h-12 rounded-full mx-auto mb-3 flex items-center justify-center"
                   style={{ background: `${COLORS.SUCCESS}1F` }}
@@ -366,12 +490,12 @@ export default function GuestServices() {
                 </p>
                 <button
                   onClick={() => setPlacedOrder(null)}
-                  className="text-sm font-medium px-4 py-2"
+                  className="text-sm font-medium px-4 py-2 transition-all duration-300 hover:scale-105"
                   style={{ background: COLORS.PRIMARY, color: COLORS.CREAM, borderRadius: BORDER_RADIUS.MEDIUM }}
                 >
                   Order more
                 </button>
-              </div>
+              </motion.div>
             ) : cart.length === 0 ? (
               <div className="text-center py-10">
                 <p className="text-sm" style={{ color: COLORS.TEXT_SECONDARY }}>
@@ -382,11 +506,11 @@ export default function GuestServices() {
               <>
                 <div className="space-y-3 mb-4 max-h-[280px] overflow-y-auto pr-1">
                   {cart.map((item) => (
-                    <div key={item.serviceId} className="flex items-start gap-3">
+                    <div key={item.serviceId} className="flex items-start gap-3 p-2 rounded-lg transition-all duration-200 hover:bg-black/5">
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-12 h-12 object-cover flex-shrink-0"
+                        className="w-12 h-12 object-cover flex-shrink-0 rounded-lg"
                         style={{ borderRadius: BORDER_RADIUS.SMALL }}
                       />
                       <div className="flex-1 min-w-0">
@@ -394,7 +518,7 @@ export default function GuestServices() {
                           <p className="text-sm font-medium leading-tight" style={{ color: COLORS.TEXT_PRIMARY }}>
                             {item.name}
                           </p>
-                          <button onClick={() => removeFromCart(item.serviceId)} aria-label={`Remove ${item.name}`}>
+                          <button onClick={() => removeFromCart(item.serviceId)} aria-label={`Remove ${item.name}`} className="transition-all duration-200 hover:scale-110">
                             <X size={14} style={{ color: COLORS.MUTED }} />
                           </button>
                         </div>
@@ -402,7 +526,7 @@ export default function GuestServices() {
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => updateCartQty(item.serviceId, -1)}
-                              className="w-5 h-5 flex items-center justify-center"
+                              className="w-5 h-5 flex items-center justify-center transition-all duration-200 hover:bg-black/5"
                               style={{ background: COLORS.BACKGROUND, borderRadius: BORDER_RADIUS.SMALL, color: COLORS.TEXT_SECONDARY }}
                             >
                               <Minus size={11} />
@@ -410,7 +534,7 @@ export default function GuestServices() {
                             <span className="text-xs w-4 text-center" style={{ color: COLORS.TEXT_PRIMARY }}>{item.quantity}</span>
                             <button
                               onClick={() => updateCartQty(item.serviceId, 1)}
-                              className="w-5 h-5 flex items-center justify-center"
+                              className="w-5 h-5 flex items-center justify-center transition-all duration-200 hover:bg-black/5"
                               style={{ background: COLORS.BACKGROUND, borderRadius: BORDER_RADIUS.SMALL, color: COLORS.TEXT_SECONDARY }}
                             >
                               <Plus size={11} />
@@ -434,8 +558,16 @@ export default function GuestServices() {
                     onChange={(e) => setInstructions(e.target.value)}
                     placeholder="Any dietary requirements or specific notes for the staff..."
                     rows={2}
-                    className="w-full text-sm p-2.5 outline-none resize-none"
-                    style={{ border: `1px solid ${COLORS.BORDER}`, borderRadius: BORDER_RADIUS.SMALL, fontFamily: FONTS.BODY, color: COLORS.TEXT_PRIMARY }}
+                    className="w-full text-sm p-2.5 outline-none resize-none transition-all duration-300"
+                    style={{ border: `2px solid ${COLORS.BORDER}`, borderRadius: BORDER_RADIUS.SMALL, fontFamily: FONTS.BODY, color: COLORS.TEXT_PRIMARY }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = COLORS.ACCENT;
+                      e.currentTarget.style.boxShadow = `0 0 0 4px rgba(212, 168, 130, 0.1)`;
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = COLORS.BORDER;
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
                   />
                 </div>
 
@@ -454,7 +586,7 @@ export default function GuestServices() {
                   </div>
                   <div className="flex justify-between pt-2 mt-1 text-base font-semibold" style={{ borderTop: `1px solid ${COLORS.BORDER}`, color: COLORS.TEXT_PRIMARY }}>
                     <span>Grand Total</span>
-                    <span>{currency(total)}</span>
+                    <span style={{ color: COLORS.ACCENT }}>{currency(total)}</span>
                   </div>
                 </div>
 
@@ -465,7 +597,7 @@ export default function GuestServices() {
                 <div className="flex gap-2 mt-4">
                   <button
                     onClick={() => setCart([])}
-                    className="flex-1 text-sm font-medium py-2.5"
+                    className="flex-1 text-sm font-medium py-2.5 transition-all duration-300 hover:bg-black/5"
                     style={{ border: `1px solid ${COLORS.BORDER}`, borderRadius: BORDER_RADIUS.MEDIUM, color: COLORS.TEXT_SECONDARY }}
                   >
                     Clear
@@ -473,7 +605,7 @@ export default function GuestServices() {
                   <button
                     onClick={handlePlaceOrder}
                     disabled={placing}
-                    className="flex-[2] text-sm font-medium py-2.5"
+                    className="flex-[2] text-sm font-medium py-2.5 transition-all duration-300 hover:scale-105 disabled:opacity-50"
                     style={{
                       background: COLORS.PRIMARY, color: COLORS.CREAM,
                       borderRadius: BORDER_RADIUS.MEDIUM,
@@ -506,7 +638,7 @@ export default function GuestServices() {
                 <button
                   onClick={() => scrollCurated(-1)}
                   aria-label="Scroll left"
-                  className="w-8 h-8 flex items-center justify-center rounded-full"
+                  className="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300 hover:bg-black/5"
                   style={{ border: `1px solid ${COLORS.BORDER}`, color: COLORS.TEXT_SECONDARY }}
                 >
                   <ChevronLeft size={15} />
@@ -514,7 +646,7 @@ export default function GuestServices() {
                 <button
                   onClick={() => scrollCurated(1)}
                   aria-label="Scroll right"
-                  className="w-8 h-8 flex items-center justify-center rounded-full"
+                  className="w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300 hover:bg-black/5"
                   style={{ border: `1px solid ${COLORS.BORDER}`, color: COLORS.TEXT_SECONDARY }}
                 >
                   <ChevronRight size={15} />
@@ -557,7 +689,7 @@ export default function GuestServices() {
               >
                 <button
                   onClick={() => setOpenFaq(isOpen ? null : i)}
-                  className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
+                  className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left transition-all duration-200 hover:bg-black/5 rounded-lg"
                 >
                   <span className="text-sm font-medium" style={{ color: COLORS.TEXT_PRIMARY }}>{faq.q}</span>
                   <ChevronDown
@@ -566,9 +698,15 @@ export default function GuestServices() {
                   />
                 </button>
                 {isOpen && (
-                  <p className="px-5 pb-4 text-sm" style={{ color: COLORS.TEXT_SECONDARY, lineHeight: 1.7 }}>
-                    {faq.a}
-                  </p>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <p className="px-5 pb-4 text-sm" style={{ color: COLORS.TEXT_SECONDARY, lineHeight: 1.7 }}>
+                      {faq.a}
+                    </p>
+                  </motion.div>
                 )}
               </div>
             );
@@ -579,17 +717,19 @@ export default function GuestServices() {
   );
 }
 
-// ── Service card — reused by both the main grid and the curated carousel ──
+// ── Service card ──
 function ServiceCard({ service, qty, onQtyChange, onAdd }) {
   const isAvailable = service.status === "available";
 
   return (
-    <div
-      className="overflow-hidden h-full flex flex-col"
+    <motion.div
+      {...fadeUp}
+      className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
       style={{ background: COLORS.SURFACE, border: `1px solid ${COLORS.BORDER}`, borderRadius: BORDER_RADIUS.LARGE }}
     >
-      <div className="relative h-40">
-        <img src={service.image} alt={service.name} className="w-full h-full object-cover" />
+      <div className="relative h-40 overflow-hidden">
+        <img src={service.image} alt={service.name} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
         <span
           className="absolute top-2.5 left-2.5 text-xs font-semibold px-2.5 py-1"
           style={{ background: COLORS.SURFACE, color: COLORS.TEXT_PRIMARY, borderRadius: BORDER_RADIUS.PILL }}
@@ -634,7 +774,7 @@ function ServiceCard({ service, qty, onQtyChange, onAdd }) {
             <div className="flex items-center gap-2.5">
               <button
                 onClick={() => onQtyChange(qty - 1)}
-                className="w-6 h-6 flex items-center justify-center"
+                className="w-6 h-6 flex items-center justify-center transition-all duration-200 hover:bg-black/5"
                 style={{ background: COLORS.BACKGROUND, borderRadius: BORDER_RADIUS.SMALL, color: COLORS.TEXT_SECONDARY }}
               >
                 <Minus size={12} />
@@ -642,7 +782,7 @@ function ServiceCard({ service, qty, onQtyChange, onAdd }) {
               <span className="text-sm w-4 text-center" style={{ color: COLORS.TEXT_PRIMARY }}>{qty}</span>
               <button
                 onClick={() => onQtyChange(qty + 1)}
-                className="w-6 h-6 flex items-center justify-center"
+                className="w-6 h-6 flex items-center justify-center transition-all duration-200 hover:bg-black/5"
                 style={{ background: COLORS.BACKGROUND, borderRadius: BORDER_RADIUS.SMALL, color: COLORS.TEXT_SECONDARY }}
               >
                 <Plus size={12} />
@@ -650,7 +790,7 @@ function ServiceCard({ service, qty, onQtyChange, onAdd }) {
             </div>
             <button
               onClick={onAdd}
-              className="text-xs font-semibold px-4 py-2"
+              className="text-xs font-semibold px-4 py-2 transition-all duration-300 hover:scale-105"
               style={{ background: COLORS.PRIMARY, color: COLORS.CREAM, borderRadius: BORDER_RADIUS.PILL }}
             >
               Add
@@ -667,6 +807,6 @@ function ServiceCard({ service, qty, onQtyChange, onAdd }) {
           </button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

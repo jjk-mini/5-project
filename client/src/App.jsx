@@ -27,8 +27,8 @@ import HomeService from "./pages/HomeService"
 import RoomManagement from "./pages/RoomManagement"
 import CheckInOut from "./pages/CheckInOut"
 import HousekeepingPage from "./pages/HousekeepingDashboard"
-import MantenanceRequestsPage from "./pages/MaintenanceRequestsPage"
-// import GuestDashboard from "./pages/GuestDashboard"
+import MaintenanceRequestsPage from "./pages/MaintenanceRequestsPage"
+
 import ReportsPage from "./pages/ReportsPage"
 import FeedbackPage from "./pages/FeedbackPage"
 import Accommodations from "./pages/Accommodations"
@@ -47,7 +47,11 @@ import ManagerDashboard  from "./pages/ManagerDashboard"
 import ReceptionistDashboard from "./pages/ReceptionistDasboard"
 import ServicesPage from "./pages/ServicesPage"
 import ServiceRequestPage from "./pages/componnts/ServicesRequestPage"
-
+import MaintenanceRequestPage from "./pages/MaintenanceRequestsPage";
+import ServiceCatalogPage from "./pages/ServiceCatalogPage";
+import NewBookingPage from "./pages/NewBookingPage";
+import EditBookingPage from "./pages/EditBookingPage";
+import BillingManagementPage from "./pages/BillingManagementPage"
 
 function Placeholder({ title, owner }) {
   return (
@@ -187,6 +191,14 @@ export default function App(){
    </Layout>
   } />
 
+<Route path="/admin/services/catalog" element={
+  <Layout showFooter={false} showNav={false}>
+    <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER]}>
+      <ServiceCatalogPage />
+    </RoleRoute>
+  </Layout>
+} />
+
   <Route
   path="/receptionist/dashboard"
   element={
@@ -238,6 +250,14 @@ export default function App(){
         </Layout>
       } />
 
+<Route
+  path="/booking/newbooking"
+element={
+      <NewBookingPage />
+}
+  />
+<Route path="/admin/bookings/edit/:id" element={<EditBookingPage />} />
+
 
          <Route path="/admin/bookings" element={
         <Layout showFooter={false} showNav={false}>
@@ -272,14 +292,45 @@ export default function App(){
         </Layout>
       } />
 
-      
-      <Route path="/receptionist/billing" element={
+         <Route path="/receptionist/billing/:bookingId?" element={
         <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
             < BillingPage />
           </RoleRoute>
         </Layout>
       } />
+
+      <Route
+        path="/billing/:bookingId"
+        element={
+          <Layout showFooter>
+            <RoleRoute
+              allowedRoles={[
+                ROLES.GUEST,
+                ROLES.ADMIN,
+                ROLES.MANAGER,
+                ROLES.RECEPTIONIST,
+              ]}
+            >
+              <BillingPage />
+            </RoleRoute>
+          </Layout>
+        }
+      />
+   <Route path="/admin/billing" element={
+  <Layout showFooter={false} showNav={false}>
+    <RoleRoute allowedRoles={[ROLES.ADMIN]}>
+      <BillingManagementPage />
+    </RoleRoute>
+  </Layout>
+} />
+      {/* <Route path="/receptionist/billing" element={
+        <Layout showFooter={false} showNav={false}>
+          <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.RECEPTIONIST]}>
+            < BillingPage />
+          </RoleRoute>
+        </Layout>
+      } /> */}
 
 
 <Route path="/housekeeping/dashboard" element={
@@ -293,7 +344,7 @@ export default function App(){
             <Route path="/housekeeping/maintenance" element={
         <Layout showFooter={false} showNav={false}>
           <RoleRoute allowedRoles={[ROLES.ADMIN, ROLES.HOUSEKEEPING]}>
-            < MantenanceRequestsPage />
+            < MaintenanceRequestPage />
           </RoleRoute>
         </Layout>
       } />
@@ -307,7 +358,7 @@ export default function App(){
       } /> */}
 
       <Route path="/guest/services" element={
-        <Layout showFooter={false} showNav={false}>
+        <Layout showFooter={true} >
           <RoleRoute allowedRoles={[ROLES.GUEST]}>
            <GuestServices/>
           </RoleRoute>
@@ -322,8 +373,8 @@ export default function App(){
       } /> */}
 
             <Route path="/guest/feedback" element={
-        <Layout showFooter={false} showNav={false}>
-          <RoleRoute allowedRoles={[ROLES.GUEST]}>
+        <Layout showFooter={true} >
+          <RoleRoute allowedRoles={[ROLES.GUEST, ROLES.ADMIN, ROLES.MANAGER]}>
             <FeedbackPage />
           </RoleRoute>
         </Layout>

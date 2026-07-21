@@ -24,10 +24,18 @@ const PUBLIC_LINKS = [
   { label: "Contact", path: "/contact" },
 ];
 
-// Guests still get a full top navbar (they have no sidebar). Staff roles
-// (admin/manager/receptionist/housekeeping) no longer get links here at
-// all — that navigation now lives entirely in AsideBar.jsx.
+
 const GUEST_LINKS = [
+  { label: "Home", path: "/" },
+  { label: "About", path: "/#about" },
+  { label: "Services", path: "/HomeService" },
+  { label: "Contact", path: "/contact" },
+  { label: "Gallery", path: "/gallery" },
+  { label: "Rooms", path: "/rooms" },
+  { label: "Feedback", path: "/guest/feedback" },
+];
+
+const ADMIN_LINK = [
   { label: "Home", path: "/" },
   { label: "About", path: "/#about" },
   { label: "Services", path: "/HomeService" },
@@ -71,8 +79,7 @@ export default function Navbar() {
 
   const initials = getInitials(user?.name);
 
-  // Real notifications from the backend — fetched on login, then polled
-  // every 30s so the bell stays fresh without needing a socket.
+//  notification 
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -84,7 +91,7 @@ export default function Navbar() {
         setNotifications(res.data?.notifications || []);
         setUnreadCount(res.data?.unreadCount || 0);
       } catch {
-        // silent — notifications aren't critical enough to show an error banner
+        
       }
     };
 
@@ -103,7 +110,6 @@ export default function Navbar() {
       try {
         await notificationApi.markAsRead(n._id);
       } catch {
-        // best-effort — UI already updated optimistically
       }
     }
     if (n.link) navigate(n.link);
@@ -135,8 +141,8 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
-  // Shared notification bell — used by both staff and guest modes,
-  // just tinted differently via the `dark` flag.
+// notification 
+
   const NotificationBell = ({ dark }) => (
     <div ref={notifRef} style={{ position: "relative" }}>
       <button
@@ -226,7 +232,7 @@ export default function Navbar() {
     </div>
   );
 
-  // Shared profile avatar + dropdown — used by staff and guest modes.
+  // profile avatar
   const ProfileMenu = () => (
     <div ref={profileRef} style={{ position: "relative" }}>
       <button
@@ -320,19 +326,7 @@ export default function Navbar() {
     </div>
   );
 
-  // ══════════════════════════════════════════════════════════════════
-  // STAFF MODE — admin / manager / receptionist / housekeeping.
-  // Same burgundy + gold language as AsideBar, docked flush beside it,
-  // no page links (the sidebar owns those now). Just notifications +
-  // profile, on a bar that visually reads as one piece with the sidebar.
-  //
-  // NOTE: AsideBar is hidden below the `lg` breakpoint for now, and this
-  // topbar only reserves sidebar space at `lg` too. Below that there's
-  // currently no staff navigation — wiring up an off-canvas sidebar
-  // toggle needs a bit of shared state between this file and AsideBar
-  // (e.g. via a Layout wrapper or context), which I can add next if
-  // you want mobile staff nav.
-  // ══════════════════════════════════════════════════════════════════
+
   if (isStaff) {
     return (
       <header
@@ -358,10 +352,7 @@ export default function Navbar() {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════════
-  // GUEST MODE — logged-in guest. Full top navbar with their own links,
-  // same general look as the public navbar, avatar dropdown on the right.
-  // ══════════════════════════════════════════════════════════════════
+// loged in guesy navbar
   if (isGuestUser) {
     const linkStyle = (path) => ({
       fontFamily: FONTS.BODY,

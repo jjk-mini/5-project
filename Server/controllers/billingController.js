@@ -195,10 +195,17 @@ const payBilling = asyncHandler(async (req, res) => {
   billing.paidAt = new Date();
   await billing.save();
 
-  // Keep the booking record in sync with the payment outcome
+  // Keep the booking record in sync with the payment outcome — payment
+  // status always flips to paid, and a booking still sitting in "pending"
+  // (the default status when a guest books) is auto-confirmed once payment
+  // goes through, so the guest's Booking Status actually changes on the
+  // Billing page instead of being stuck on Pending forever.
   const booking = await Booking.findById(billing.booking._id);
   if (booking) {
     booking.paymentStatus = "paid";
+    if (booking.status === "pending") {
+      booking.status = "confirmed";
+    }
     await booking.save();
   }
 

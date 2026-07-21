@@ -9,11 +9,7 @@ import bookingApi from "../api/bookingApi";
 import { ROLES } from "../constants/roles";
 import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
 import AsideBar from "../components/AsideBar";
-
-
-
-
-// import getDashboardLinks from "../utils/dashboardLinks.jsx";
+import { CalendarCheck, Users, BedDouble, Clock } from "lucide-react";
 
 const STATUS_FLOW = ["pending", "confirmed", "checked-in", "checked-out", "cancelled"];
 
@@ -24,7 +20,6 @@ const STATUS_COLORS = {
   "checked-out": COLORS.TEXT_SECONDARY,
   cancelled: COLORS.ERROR,
 };
-
 
 const BILLING_COLORS = {
   Paid: COLORS.SUCCESS,
@@ -37,33 +32,30 @@ const BookingPage = () => {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
- 
 
-  const tint = (hex, alpha = "1F") => `${hex}${alpha}`;
+  const tint = (hex, alpha = "20") => `${hex}${alpha}`;
 
-const COLUMNS = [
-  { key: "bookingId", label: "Booking ID", sortable: true },
-  { key: "guest", label: "Guest Name", sortable: true, staffOnly: true },
-  { key: "room", label: "Room", sortable: true },
-  { key: "roomType", label: "Room Type", sortable: true },
-  { key: "checkIn", label: "Check-In", sortable: true },
-  { key: "checkOut", label: "Check-Out", sortable: true },
-  { key: "nights", label: "Nights / Total", sortable: false },
-  { key: "status", label: "Status", sortable: true },
-  { key: "billing", label: "Billing", sortable: true },
-  { key: "actions", label: "Actions", sortable: false },
-];
+  const COLUMNS = [
+    { key: "bookingId", label: "Booking ID", sortable: true },
+    { key: "guest", label: "Guest Name", sortable: true, staffOnly: true },
+    { key: "room", label: "Room", sortable: true },
+    { key: "roomType", label: "Room Type", sortable: true },
+    { key: "checkIn", label: "Check-In", sortable: true },
+    { key: "checkOut", label: "Check-Out", sortable: true },
+    { key: "nights", label: "Nights / Total", sortable: false },
+    { key: "status", label: "Status", sortable: true },
+    { key: "billing", label: "Billing", sortable: true },
+    { key: "actions", label: "Actions", sortable: false },
+  ];
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 
-
-  const isStaffOrAdmin = 
-  user?.role === ROLES.ADMIN || 
+  const isStaffOrAdmin =
+    user?.role === ROLES.ADMIN ||
     user?.role === ROLES.MANAGER ||
-  user?.role === ROLES.RECEPTIONIST;
-  
+    user?.role === ROLES.RECEPTIONIST;
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -81,11 +73,11 @@ const COLUMNS = [
     fetchBookings();
   }, []);
 
- const handleStatusChange = async (id, status) => {
+  const handleStatusChange = async (id, status) => {
     try {
       await bookingApi.updateStatus(id, status);
       toast.success("Booking status updated");
-      fetchBookings(); // refresh list
+      fetchBookings();
     } catch (err) {
       toast.error(err.response?.data?.message || "Update failed");
     }
@@ -102,15 +94,14 @@ const COLUMNS = [
     }
   };
 
-    const handleSort = (key) => {
+  const handleSort = (key) => {
     setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
     }));
   };
 
-
-    const stats = useMemo(() => {
+  const stats = useMemo(() => {
     const count = (status) => bookings.filter((b) => b.status === status).length;
     return [
       { label: "Total", value: bookings.length, color: COLORS.TEXT_PRIMARY },
@@ -121,10 +112,9 @@ const COLUMNS = [
     ];
   }, [bookings]);
 
- const visibleColumns = COLUMNS.filter((c) => !c.staffOnly || isStaffOrAdmin);
+  const visibleColumns = COLUMNS.filter((c) => !c.staffOnly || isStaffOrAdmin);
 
-
-   const filteredBookings = useMemo(() => {
+  const filteredBookings = useMemo(() => {
     let list = [...bookings];
 
     if (statusFilter !== "all") {
@@ -140,7 +130,7 @@ const COLUMNS = [
       );
     }
 
-        if (sortConfig.key) {
+    if (sortConfig.key) {
       const getValue = (b) => {
         switch (sortConfig.key) {
           case "bookingId": return b._id || "";
@@ -155,7 +145,7 @@ const COLUMNS = [
         }
       };
 
-            list.sort((a, b) => {
+      list.sort((a, b) => {
         const va = getValue(a);
         const vb = getValue(b);
         if (va < vb) return sortConfig.direction === "asc" ? -1 : 1;
@@ -168,363 +158,633 @@ const COLUMNS = [
   }, [bookings, searchQuery, statusFilter, sortConfig]);
 
   const sortIndicator = (key) => {
-    if (sortConfig.key !== key) return "\u21C5"; // ⇅ neutral
-    return sortConfig.direction === "asc" ? "\u2191" : "\u2193"; // ↑ / ↓
+    if (sortConfig.key !== key) return "\u21C5";
+    return sortConfig.direction === "asc" ? "\u2191" : "\u2193";
   };
 
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        background: COLORS.BACKGROUND,
+        fontFamily: FONTS.BODY,
+      }}
+    >
+      <AsideBar />
 
- return (
-<div
-  style={{
-    minHeight: "100vh",
-    display: "flex",
-    background: COLORS.BACKGROUND,
-    fontFamily: FONTS.BODY,
-  }}
->
-  <AsideBar />
+      <main
+        style={{
+          flex: 1,
+          padding: "32px",
+          overflowY: "auto",
+        }}
+      >
+        {/* Header */}
+        <div
+          className="mb-8 p-8"
+          style={{
+            background: `linear-gradient(135deg, ${COLORS.PRIMARY}, #3B2D25)`,
+            borderRadius: BORDER_RADIUS.LARGE,
+            boxShadow: SHADOWS.CARD,
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div
+                className="p-4"
+                style={{
+                  backgroundColor: COLORS.ACCENT,
+                  borderRadius: BORDER_RADIUS.LARGE,
+                }}
+              >
+                <CalendarCheck size={35} style={{ color: COLORS.PRIMARY }} />
+              </div>
 
-  <main
-    style={{
-      flex: 1,
-      padding: "32px",
-      overflowY: "auto",
-    }}
-  >
+              <div>
+                <h1
+                  className="text-4xl font-bold"
+                  style={{
+                    color: "#fff",
+                    fontFamily: FONTS.HEADING,
+                  }}
+                >
+                  Booking Management
+                </h1>
 
-      {/* Breadcrumb */}
-      <div style={{ fontSize: "12px", color: COLORS.TEXT_SECONDARY, marginBottom: "8px" }}>
-        <Link to="/" style={{ color: COLORS.TEXT_SECONDARY, textDecoration: "none" }}>Dashboard</Link>
-        {" / "}
-        <span style={{ color: COLORS.PRIMARY, fontWeight: 600 }}>Booking Management</span>
-      </div>
+                <p
+                  className="mt-2"
+                  style={{
+                    color: COLORS.ACCENT,
+                    fontFamily: FONTS.BODY,
+                  }}
+                >
+                  Create, manage, and track all hotel reservations
+                </p>
+              </div>
+            </div>
 
-      {/* Page header */}
-           <div style={{ marginBottom: "24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "16px" }}>
-             <div>
-               <h1 style={{ fontFamily: FONTS.HEADING, fontSize: "26px", color: COLORS.DARK, margin: 0 }}>
-                 {isStaffOrAdmin ? "Booking Management" : "My Bookings"}
-               </h1>
-               <p style={{ fontSize: "13px", color: COLORS.TEXT_SECONDARY, marginTop: "4px" }}>
-                 {isStaffOrAdmin
-                   ? "Create, manage, and track all hotel reservations"
-                   : "View and manage your reservations"}
-               </p>
-             </div>
-     
-             {isStaffOrAdmin && (
-               <Link
-                 to="/booking/newbooking"
-                 style={{
-                   background: COLORS.PRIMARY,
-                   color: COLORS.CREAM,
-                   fontSize: "13px",
-                   fontWeight: 600,
-                   padding: "10px 18px",
-                   borderRadius: BORDER_RADIUS.PILL,
-                   textDecoration: "none",
-                   boxShadow: SHADOWS.DROPDOWN,
-                   whiteSpace: "nowrap",
-                 }}
-               >
-                 + New Booking
-               </Link>
-             )}
-           </div>
-     
+            {isStaffOrAdmin && (
+              <Link
+                to="/booking/newbooking"
+                style={{
+                  background: COLORS.ACCENT,
+                  color: COLORS.PRIMARY,
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  padding: "10px 18px",
+                  borderRadius: BORDER_RADIUS.MEDIUM,
+                  textDecoration: "none",
+                  boxShadow: SHADOWS.DROPDOWN,
+                  whiteSpace: "nowrap",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.05)";
+                  e.currentTarget.style.boxShadow = `0 4px 20px rgba(212,168,130,0.3)`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = SHADOWS.DROPDOWN;
+                }}
+              >
+                + New Booking
+              </Link>
+            )}
+          </div>
+        </div>
 
- {/* Stat cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "12px", marginBottom: "20px" }}>
-        {stats.map(({ label, value, color }) => (
+        {/* Stat cards */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+            gap: "12px",
+            marginBottom: "20px",
+          }}
+        >
+          {stats.map(({ label, value, color }) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              style={{
+                background: label === "Total" ? COLORS.SURFACE : tint(color),
+                border: `1px solid ${label === "Total" ? COLORS.BORDER : tint(color, "40")}`,
+                borderRadius: BORDER_RADIUS.MEDIUM,
+                padding: "16px",
+                textAlign: "center",
+                boxShadow: SHADOWS.CARD,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "24px",
+                  fontWeight: 700,
+                  color,
+                  fontFamily: FONTS.HEADING,
+                }}
+              >
+                {value}
+              </div>
+              <div
+                style={{
+                  fontSize: "11px",
+                  color: COLORS.TEXT_SECONDARY,
+                  marginTop: "2px",
+                  fontWeight: 500,
+                }}
+              >
+                {label}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Search + filter */}
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "12px",
+            marginBottom: "16px",
+          }}
+        >
           <div
-            key={label}
             style={{
-              background: label === "Total" ? COLORS.SURFACE : tint(color),
-              border: `0.5px solid ${COLORS.BORDER}`,
+              flex: "1 1 280px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              background: COLORS.SURFACE,
+              border: `1px solid ${COLORS.BORDER}`,
               borderRadius: BORDER_RADIUS.MEDIUM,
-              padding: "16px",
-              textAlign: "center",
+              padding: "8px 14px",
+              transition: "all 0.3s ease",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = COLORS.ACCENT;
+              e.currentTarget.style.boxShadow = `0 0 0 3px rgba(212,168,130,0.1)`;
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = COLORS.BORDER;
+              e.currentTarget.style.boxShadow = "none";
             }}
           >
-            <div style={{ fontSize: "22px", fontWeight: 700, color, fontFamily: FONTS.HEADING }}>
-              {value}
-            </div>
-            <div style={{ fontSize: "12px", color: COLORS.TEXT_SECONDARY, marginTop: "2px" }}>
-              {label}
-            </div>
+            <HiSearch size={16} color={COLORS.MUTED} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by guest, booking ID, room..."
+              style={{
+                border: "none",
+                outline: "none",
+                flex: 1,
+                fontSize: "13px",
+                fontFamily: FONTS.BODY,
+                color: COLORS.TEXT_PRIMARY,
+                background: "transparent",
+              }}
+            />
           </div>
-        ))}
-      </div>
 
-{/* Search + filter */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginBottom: "16px" }}>
-        <div style={{
-          flex: "1 1 280px",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          background: COLORS.SURFACE,
-          border: `0.5px solid ${COLORS.BORDER}`,
-          borderRadius: BORDER_RADIUS.MEDIUM,
-          padding: "10px 14px",
-        }}>
-          <HiSearch size={16} color={COLORS.MUTED} />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by guest, booking ID, room..."
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
             style={{
-              border: "none",
-              outline: "none",
-              flex: 1,
+              border: `1px solid ${COLORS.BORDER}`,
+              borderRadius: BORDER_RADIUS.MEDIUM,
+              padding: "8px 14px",
               fontSize: "13px",
               fontFamily: FONTS.BODY,
               color: COLORS.TEXT_PRIMARY,
-              background: "transparent",
+              background: COLORS.SURFACE,
+              cursor: "pointer",
+              outline: "none",
+              transition: "all 0.3s ease",
             }}
-          />
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = COLORS.ACCENT;
+              e.currentTarget.style.boxShadow = `0 0 0 3px rgba(212,168,130,0.1)`;
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = COLORS.BORDER;
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            <option value="all">All Statuses</option>
+            {STATUS_FLOW.map((s) => (
+              <option key={s} value={s}>
+                {s.charAt(0).toUpperCase() + s.slice(1)}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+        {/* Table card */}
+        <div
           style={{
-            border: `0.5px solid ${COLORS.BORDER}`,
-            borderRadius: BORDER_RADIUS.MEDIUM,
-            padding: "10px 14px",
-            fontSize: "13px",
-            fontFamily: FONTS.BODY,
-            color: COLORS.TEXT_PRIMARY,
             background: COLORS.SURFACE,
-            cursor: "pointer",
+            border: `1px solid ${COLORS.BORDER}`,
+            borderRadius: BORDER_RADIUS.LARGE,
+            boxShadow: SHADOWS.CARD,
+            overflow: "hidden",
           }}
         >
-          <option value="all">All Statuses</option>
-          {STATUS_FLOW.map((s) => (
-            <option key={s} value={s}>
-              {s.charAt(0).toUpperCase() + s.slice(1)}
-            </option>
-          ))}
-        </select>
-      </div>
-
- {/* Table card */}
-      <div style={{
-        background: COLORS.SURFACE,
-        border: `0.5px solid ${COLORS.BORDER}`,
-        borderRadius: BORDER_RADIUS.MEDIUM,
-        boxShadow: SHADOWS.CARD,
-        overflowX: "auto",
-      }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
-
-          {/* Head */}
-          <thead>
-            <tr style={{ background: COLORS.PRIMARY, textAlign: "left" }}>
-              {visibleColumns.map((col) => (
-                <th
-                  key={col.key}
-                  onClick={col.sortable ? () => handleSort(col.key) : undefined}
+          <div style={{ overflowX: "auto" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: "13px",
+                minWidth: "1100px",
+              }}
+            >
+              {/* Head */}
+              <thead>
+                <tr
                   style={{
-                    padding: "12px 16px",
-                    color: COLORS.CREAM,
-                    fontWeight: 500,
-                    fontSize: "11px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    fontFamily: FONTS.BODY,
-                    cursor: col.sortable ? "pointer" : "default",
-                    userSelect: "none",
-                    whiteSpace: "nowrap",
+                    background: `linear-gradient(135deg, ${COLORS.PRIMARY}, #3B2D25)`,
                   }}
                 >
-                  {col.label}
-                  {col.sortable && (
-                    <span style={{ marginLeft: "4px", opacity: sortConfig.key === col.key ? 1 : 0.5 }}>
-                      {sortIndicator(col.key)}
-                    </span>
-                  )}
-                </th>
-              ))}
-            </tr>
-          </thead>
-
-          {/* Body */}
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan={visibleColumns.length}
-                  style={{ padding: "32px", textAlign: "center", color: COLORS.TEXT_SECONDARY, fontFamily: FONTS.BODY }}>
-                  Loading bookings...
-                </td>
-              </tr>
-            ) : filteredBookings.length === 0 ? (
-              <tr>
-                <td colSpan={visibleColumns.length}
-                  style={{ padding: "32px", textAlign: "center", color: COLORS.TEXT_SECONDARY, fontFamily: FONTS.BODY }}>
-                  No bookings found.
-                </td>
-              </tr>
-            ) : (
-              filteredBookings.map((b) => {
-                const statusColor = STATUS_COLORS[b.status] || COLORS.MUTED;
-                const billingLabel = b.billingStatus || "Not Billed";
-                const billingColor = BILLING_COLORS[billingLabel] || COLORS.MUTED;
-                const initial = b.guest?.name?.charAt(0)?.toUpperCase() || "?";
-
-                return (
-                  <motion.tr
-                    key={b._id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    onClick={() => navigate(`/bookings/${b._id}`)}
-                    style={{ borderTop: `0.5px solid ${COLORS.BORDER}`, cursor: "pointer" }}
-                  >
-                    <td style={{ padding: "14px 16px", color: COLORS.PRIMARY, fontWeight: 600 }}>
-                      #{b._id?.slice(-6).toUpperCase()}
-                    </td>
-
-                    {isStaffOrAdmin && (
-                      <td style={{ padding: "14px 16px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span style={{
-                            width: "26px",
-                            height: "26px",
-                            borderRadius: BORDER_RADIUS.PILL,
-                            background: COLORS.PRIMARY,
-                            color: COLORS.CREAM,
-                            fontSize: "11px",
-                            fontWeight: 700,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                          }}>
-                            {initial}
-                          </span>
-                          <span style={{ color: COLORS.TEXT_PRIMARY, fontWeight: 500 }}>
-                            {b.guest?.name}
-                          </span>
-                        </div>
-                      </td>
-                    )}
-
-                    <td style={{ padding: "14px 16px", color: COLORS.TEXT_PRIMARY }}>
-                      {b.room?.roomNumber}
-                    </td>
-
-                    <td style={{ padding: "14px 16px", color: COLORS.TEXT_PRIMARY }}>
-                      {b.room?.type}
-                    </td>
-
-                    <td style={{ padding: "14px 16px", color: COLORS.TEXT_PRIMARY }}>
-                      {new Date(b.checkIn).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })}
-                    </td>
-
-                    <td style={{ padding: "14px 16px", color: COLORS.TEXT_PRIMARY }}>
-                      {new Date(b.checkOut).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })}
-                    </td>
-
-                    <td style={{ padding: "14px 16px", color: COLORS.TEXT_PRIMARY }}>
-                      {b.nights}n &middot; Rs. {b.totalAmount?.toLocaleString()}
-                    </td>
-
-                    <td style={{ padding: "14px 16px" }} onClick={(e) => e.stopPropagation()}>
-                      {isStaffOrAdmin ? (
-                        <select
-                          value={b.status}
-                          onChange={(e) => handleStatusChange(b._id, e.target.value)}
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 600,
-                            border: "none",
-                            borderRadius: BORDER_RADIUS.PILL,
-                            padding: "5px 10px",
-                            background: tint(statusColor),
-                            color: statusColor,
-                            fontFamily: FONTS.BODY,
-                            outline: "none",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {STATUS_FLOW.map((s) => (
-                            <option key={s} value={s}>
-                              {s.charAt(0).toUpperCase() + s.slice(1)}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <StatusBadge status={b.status} />
-                      )}
-                    </td>
-
-                    <td style={{ padding: "14px 16px" }}>
-                      <span style={{
-                        fontSize: "12px",
+                  {visibleColumns.map((col) => (
+                    <th
+                      key={col.key}
+                      onClick={col.sortable ? () => handleSort(col.key) : undefined}
+                      style={{
+                        padding: "14px 16px",
+                        color: COLORS.ACCENT,
                         fontWeight: 600,
-                        padding: "5px 10px",
-                        borderRadius: BORDER_RADIUS.PILL,
-                        background: tint(billingColor),
-                        color: billingColor,
-                      }}>
-                        {billingLabel}
-                      </span>
-                    </td>
-
-                    <td style={{ padding: "14px 16px" }} onClick={(e) => e.stopPropagation()}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                        {isStaffOrAdmin && (
-                          <Link
-                            to={`/bookings/${b._id}/edit`}
-                            style={{ color: COLORS.WARNING, padding: "4px" }}
-                            title="Edit booking"
-                          >
-                            <HiPencilAlt size={16} />
-                          </Link>
-                        )}
-
-                        {["pending", "confirmed"].includes(b.status) && (
-                          <button
-                            onClick={() => handleCancel(b._id)}
+                        fontSize: "11px",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.08em",
+                        fontFamily: FONTS.BODY,
+                        cursor: col.sortable ? "pointer" : "default",
+                        userSelect: "none",
+                        whiteSpace: "nowrap",
+                        textAlign: "left",
+                        transition: "all 0.2s ease",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        {col.label}
+                        {col.sortable && (
+                          <span
                             style={{
-                              background: "none",
-                              border: "none",
-                              color: COLORS.ERROR,
-                              cursor: "pointer",
-                              padding: "4px",
+                              marginLeft: "4px",
+                              opacity: sortConfig.key === col.key ? 1 : 0.5,
+                              fontSize: "11px",
                             }}
-                            title="Cancel booking"
                           >
-                            <HiTrash size={16} />
-                          </button>
+                            {sortIndicator(col.key)}
+                          </span>
                         )}
                       </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              {/* Body */}
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={visibleColumns.length}
+                      style={{
+                        padding: "48px",
+                        textAlign: "center",
+                        color: COLORS.TEXT_SECONDARY,
+                        fontFamily: FONTS.BODY,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "inline-block",
+                          width: "24px",
+                          height: "24px",
+                          border: `2px solid ${COLORS.BORDER}`,
+                          borderTopColor: COLORS.ACCENT,
+                          borderRadius: "50%",
+                          animation: "spin 0.8s linear infinite",
+                        }}
+                      />
+                      <p style={{ marginTop: "12px" }}>Loading bookings...</p>
                     </td>
-                  </motion.tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                  </tr>
+                ) : filteredBookings.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={visibleColumns.length}
+                      style={{
+                        padding: "48px",
+                        textAlign: "center",
+                        color: COLORS.TEXT_SECONDARY,
+                        fontFamily: FONTS.BODY,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "32px",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        📋
+                      </div>
+                      <p>No bookings found.</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredBookings.map((b, index) => {
+                    const statusColor = STATUS_COLORS[b.status] || COLORS.MUTED;
+                    const billingLabel = b.billingStatus || "Not Billed";
+                    const billingColor = BILLING_COLORS[billingLabel] || COLORS.MUTED;
+                    const initial = b.guest?.name?.charAt(0)?.toUpperCase() || "?";
 
-        {/* Footer */}
-        {!loading && bookings.length > 0 && (
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "12px 16px",
-            borderTop: `0.5px solid ${COLORS.BORDER}`,
-            fontSize: "12px",
-            color: COLORS.TEXT_SECONDARY,
-          }}>
-            <span>Showing {filteredBookings.length} of {bookings.length} bookings</span>
-            <span>Click any row to view details</span>
+                    return (
+                      <motion.tr
+                        key={b._id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.03 }}
+                        onClick={() => navigate(`/bookings/${b._id}`)}
+                        style={{
+                          borderTop: `1px solid ${COLORS.BORDER}`,
+                          cursor: "pointer",
+                          transition: "background 0.2s ease",
+                          background: index % 2 === 0 ? "transparent" : `${COLORS.BORDER}20`,
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = `${COLORS.BORDER}30`;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background =
+                            index % 2 === 0 ? "transparent" : `${COLORS.BORDER}20`;
+                        }}
+                      >
+                        <td
+                          style={{
+                            padding: "12px 16px",
+                            color: COLORS.PRIMARY,
+                            fontWeight: 600,
+                            fontSize: "12px",
+                          }}
+                        >
+                          #{b._id?.slice(-6).toUpperCase()}
+                        </td>
+
+                        {isStaffOrAdmin && (
+                          <td style={{ padding: "12px 16px" }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  width: "28px",
+                                  height: "28px",
+                                  borderRadius: BORDER_RADIUS.PILL,
+                                  background: COLORS.PRIMARY,
+                                  color: COLORS.CREAM,
+                                  fontSize: "11px",
+                                  fontWeight: 700,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {initial}
+                              </span>
+                              <span
+                                style={{
+                                  color: COLORS.TEXT_PRIMARY,
+                                  fontWeight: 500,
+                                  fontSize: "13px",
+                                }}
+                              >
+                                {b.guest?.name}
+                              </span>
+                            </div>
+                          </td>
+                        )}
+
+                        <td
+                          style={{
+                            padding: "12px 16px",
+                            color: COLORS.TEXT_PRIMARY,
+                            fontSize: "13px",
+                          }}
+                        >
+                          {b.room?.roomNumber}
+                        </td>
+
+                        <td
+                          style={{
+                            padding: "12px 16px",
+                            color: COLORS.TEXT_SECONDARY,
+                            fontSize: "13px",
+                          }}
+                        >
+                          {b.room?.type}
+                        </td>
+
+                        <td
+                          style={{
+                            padding: "12px 16px",
+                            color: COLORS.TEXT_PRIMARY,
+                            fontSize: "12px",
+                          }}
+                        >
+                          {new Date(b.checkIn).toLocaleDateString("en-PK", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+
+                        <td
+                          style={{
+                            padding: "12px 16px",
+                            color: COLORS.TEXT_PRIMARY,
+                            fontSize: "12px",
+                          }}
+                        >
+                          {new Date(b.checkOut).toLocaleDateString("en-PK", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+
+                        <td
+                          style={{
+                            padding: "12px 16px",
+                            color: COLORS.TEXT_PRIMARY,
+                            fontSize: "13px",
+                          }}
+                        >
+                          {b.nights}n · Rs. {b.totalAmount?.toLocaleString()}
+                        </td>
+
+                        <td
+                          style={{ padding: "12px 16px" }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {isStaffOrAdmin ? (
+                            <select
+                              value={b.status}
+                              onChange={(e) =>
+                                handleStatusChange(b._id, e.target.value)
+                              }
+                              style={{
+                                fontSize: "11px",
+                                fontWeight: 600,
+                                border: "none",
+                                borderRadius: BORDER_RADIUS.PILL,
+                                padding: "4px 10px",
+                                background: tint(statusColor),
+                                color: statusColor,
+                                fontFamily: FONTS.BODY,
+                                outline: "none",
+                                cursor: "pointer",
+                                width: "100%",
+                                maxWidth: "100px",
+                              }}
+                            >
+                              {STATUS_FLOW.map((s) => (
+                                <option key={s} value={s}>
+                                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <StatusBadge status={b.status} />
+                          )}
+                        </td>
+
+                        <td style={{ padding: "12px 16px" }}>
+                          <span
+                            style={{
+                              fontSize: "11px",
+                              fontWeight: 600,
+                              padding: "4px 12px",
+                              borderRadius: BORDER_RADIUS.PILL,
+                              background: tint(billingColor),
+                              color: billingColor,
+                              display: "inline-block",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {billingLabel}
+                          </span>
+                        </td>
+
+                        <td
+                          style={{ padding: "12px 16px" }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                            }}
+                          >
+                            <Link
+                              to={`/admin/bookings/edit/${b._id}`}
+                              style={{
+                                color: COLORS.WARNING,
+                                padding: "4px",
+                                transition: "all 0.2s ease",
+                              }}
+                              title="Edit booking"
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.transform = "scale(1.1)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.transform = "scale(1)";
+                              }}
+                            >
+                              <HiPencilAlt size={16} />
+                            </Link>
+
+                            {["pending", "confirmed"].includes(b.status) && (
+                              <button
+                                onClick={() => handleCancel(b._id)}
+                                style={{
+                                  background: "none",
+                                  border: "none",
+                                  color: COLORS.ERROR,
+                                  cursor: "pointer",
+                                  padding: "4px",
+                                  transition: "all 0.2s ease",
+                                }}
+                                title="Cancel booking"
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform = "scale(1.1)";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = "scale(1)";
+                                }}
+                              >
+                                <HiTrash size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </motion.tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
 
-      </div>
+          {/* Footer */}
+          {!loading && bookings.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "12px 16px",
+                borderTop: `1px solid ${COLORS.BORDER}`,
+                fontSize: "12px",
+                color: COLORS.TEXT_SECONDARY,
+                flexWrap: "wrap",
+                gap: "8px",
+              }}
+            >
+              <span>
+                Showing {filteredBookings.length} of {bookings.length} bookings
+              </span>
+              <span
+                style={{
+                  color: COLORS.ACCENT,
+                  fontWeight: 500,
+                }}
+              >
+                Click any row to view details
+              </span>
+            </div>
+          )}
+        </div>
       </main>
+
+      {/* Spin animation keyframes */}
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </div>
   );
 };

@@ -51,7 +51,7 @@ const BillingBanner = ({ booking }) => {
               className="font-semibold"
               style={{ color: COLORS.ACCENT }}
             >
-              {booking?.hotelName || "Royal Palace Hotel & Resort"}
+              { "LuxuryStay"}
             </span>
           </p>
         </div>

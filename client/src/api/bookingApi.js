@@ -1,3 +1,4 @@
+// bookingApi.js
 import axiosClient from "./AxiosClient";
 
 const bookingApi = {
@@ -9,6 +10,10 @@ const bookingApi = {
 
   create: (data) =>
     axiosClient.post("/bookings", data),
+
+  // Fix the update function - use PUT with the correct endpoint
+  update: (id, data) =>
+    axiosClient.put(`/bookings/${id}`, data),
 
   updateStatus: (id, status) =>
     axiosClient.patch(`/bookings/${id}/status`, { status }),
@@ -28,8 +33,6 @@ const bookingApi = {
   getTodayActivity: () =>
     axiosClient.get("/bookings/today"),
 
-  // Guest's own currently checked-in bookings — used to build the
-  // room-picker dropdown on the maintenance/service request form.
   getMyActiveBookings: () =>
     axiosClient.get("/bookings/mine/active"),
 };

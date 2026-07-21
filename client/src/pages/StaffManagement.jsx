@@ -77,8 +77,21 @@ function StaffManagement() {
         await updateStaff(editId, form);
         setEditId(null);
       } else {
-        // Add new staff
-        await createStaff(form);
+        // Add new staff — backend creates a real login account and
+        // returns a one-time temporary password
+        const created = await createStaff(form);
+
+        if (created?.tempPassword) {
+          await Swal.fire({
+            title: "Staff account created",
+            html: `<p style="margin-bottom:8px">Share these login details with <b>${created.name}</b>:</p>
+                   <p>Email: <b>${created.email}</b></p>
+                   <p>Temporary password: <b>${created.tempPassword}</b></p>
+                   <p style="font-size:12px;color:#888;margin-top:8px">This password is shown only once and cannot be retrieved again.</p>`,
+            icon: "success",
+            confirmButtonColor: "#5C1A2B",
+          });
+        }
       }
 
       // Clear form
@@ -104,7 +117,9 @@ function StaffManagement() {
     setForm({
       name: member.name,
       email: member.email,
-      role: member.role,
+      role: member.role
+        ? member.role.charAt(0).toUpperCase() + member.role.slice(1)
+        : "Receptionist",
     });
     setEditId(member._id);
   };
@@ -270,11 +285,10 @@ function StaffManagement() {
                   background: COLORS.SURFACE,
                 }}
               >
+                <option>Admin</option>
                 <option>Manager</option>
                 <option>Receptionist</option>
                 <option>Housekeeping</option>
-                <option>Chef</option>
-                <option>Security</option>
               </select>
 
             </div>

@@ -1,6 +1,8 @@
+// Server/controllers/bookingController.js
 const asyncHandler = require("express-async-handler");
 const Booking = require("../models/Booking");
 const Room = require("../models/Room");
+const User = require("../models/User");
 const { calcNights } = require("../utils/calBill");
 const { notifyUser, notifyRole } = require("../utils/notify");
 
@@ -19,8 +21,7 @@ const getBookings = asyncHandler(async (req, res) => {
   res.json({ success: true, count: bookings.length, bookings });
 });
 
-// @desc  Get the logged-in guest's currently active (checked-in) bookings —
-//        used to resolve "which room" for maintenance/service requests
+// @desc  Get the logged-in guest's currently active (checked-in) bookings
 // @route GET /api/bookings/mine/active
 const getMyActiveBookings = asyncHandler(async (req, res) => {
   const bookings = await Booking.find({
@@ -54,16 +55,20 @@ const getBooking = asyncHandler(async (req, res) => {
 });
 
 // @desc  Create booking — guests book for themselves; staff can book on
-//        behalf of a walk-in guest by passing `guest`
+//        behalf of a walk-in guest by passing `guest` (object or ID)
 // @route POST /api/bookings
 const createBooking = asyncHandler(async (req, res) => {
   const { room, checkIn, checkOut, guestsCount, specialRequests, guest } = req.body;
 
+  console.log("Received booking data:", req.body);
+
+  // Validate required fields
   if (!room || !checkIn || !checkOut) {
     res.status(400);
     throw new Error("Room, check-in and check-out dates are required");
   }
 
+  // Check room availability
   const roomDoc = await Room.findById(room);
   if (!roomDoc) {
     res.status(404);
@@ -77,20 +82,84 @@ const createBooking = asyncHandler(async (req, res) => {
   const nights = calcNights(checkIn, checkOut);
   const totalAmount = nights * roomDoc.price;
 
-  const booking = await Booking.create({
-    guest: req.user.role === "guest" ? req.user._id : guest,
+  let guestId;
+
+  // Determine guest ID
+  if (req.user.role === "guest") {
+    // Guest is booking for themselves
+    guestId = req.user._id;
+  } else if (guest) {
+    // Staff is booking for a guest
+    console.log("Guest data received:", guest);
+    
+    if (typeof guest === 'object' && guest.email) {
+      // Guest is an object with email
+      // Try to find existing guest by email
+      let existingGuest = await User.findOne({ email: guest.email });
+      
+      if (existingGuest) {
+        // Guest exists, use their ID
+        guestId = existingGuest._id;
+        // Update name and phone if provided and different
+        if (guest.name && guest.name !== existingGuest.name) {
+          existingGuest.name = guest.name;
+        }
+        if (guest.phone && guest.phone !== existingGuest.phone) {
+          existingGuest.phone = guest.phone;
+        }
+        if (guest.name || guest.phone) {
+          await existingGuest.save();
+        }
+        console.log("Using existing guest:", existingGuest.email);
+      } else {
+        // Create new guest user
+        const newGuest = await User.create({
+          name: guest.name || "Guest",
+          email: guest.email,
+          phone: guest.phone || "",
+          password: "guest123456", // Default password
+          role: "guest",
+        });
+        guestId = newGuest._id;
+        console.log("Created new guest:", newGuest.email);
+      }
+    } else if (typeof guest === 'string') {
+      // Guest is an ID string
+      const existingGuest = await User.findById(guest);
+      if (!existingGuest) {
+        res.status(404);
+        throw new Error("Guest not found");
+      }
+      guestId = guest;
+      console.log("Using guest ID:", guestId);
+    } else {
+      res.status(400);
+      throw new Error("Invalid guest data provided. Please provide name and email.");
+    }
+  } else {
+    res.status(400);
+    throw new Error("Guest information is required");
+  }
+
+  // Create booking with the resolved guest ID
+  const bookingData = {
+    guest: guestId,
     room,
     checkIn,
     checkOut,
     guestsCount: guestsCount || 1,
     nights,
     totalAmount,
-    specialRequests,
+    specialRequests: specialRequests || "",
     createdBy: req.user._id,
     status: req.user.role === "guest" ? "pending" : "confirmed",
-  });
+  };
 
-  // Reserve the room so it doesn't get double-booked while pending/confirmed
+  console.log("Creating booking with data:", bookingData);
+
+  const booking = await Booking.create(bookingData);
+
+  // Reserve the room
   roomDoc.status = "reserved";
   await roomDoc.save();
 
@@ -99,7 +168,7 @@ const createBooking = asyncHandler(async (req, res) => {
     { path: "guest", select: "name email phone" },
   ]);
 
-  // Let front-desk staff know a new booking came in
+  // Notify staff
   notifyRole({
     role: "receptionist",
     title: "New booking",
@@ -136,7 +205,7 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
       await booking.room.save();
     }
     if (status === "checked-out") {
-      booking.room.status = "cleaning"; // housekeeping needs to turn it over
+      booking.room.status = "cleaning";
       await booking.room.save();
     }
     if (status === "cancelled") {
@@ -177,7 +246,7 @@ const updateBookingStatus = asyncHandler(async (req, res) => {
   res.json({ success: true, booking });
 });
 
-// @desc  Update booking (dates, guests, requests)
+// @desc  Update booking (full update)
 // @route PUT /api/bookings/:id
 const updateBooking = asyncHandler(async (req, res) => {
   const booking = await Booking.findById(req.params.id).populate("room");
@@ -186,20 +255,80 @@ const updateBooking = asyncHandler(async (req, res) => {
     throw new Error("Booking not found");
   }
 
-  const { checkIn, checkOut, guestsCount, specialRequests } = req.body;
+  const { 
+    checkIn, 
+    checkOut, 
+    guestsCount, 
+    specialRequests,
+    guestName,
+    guestEmail,
+    guestPhone,
+    room,
+    status,
+    billingStatus,
+    nights,
+    totalAmount
+  } = req.body;
 
+  // Update guest info if provided
+  if (guestName || guestEmail || guestPhone) {
+    if (booking.guest) {
+      const guest = await User.findById(booking.guest);
+      if (guest) {
+        if (guestName) guest.name = guestName;
+        if (guestEmail) guest.email = guestEmail;
+        if (guestPhone) guest.phone = guestPhone;
+        await guest.save();
+      }
+    }
+  }
+
+  // Update room if changed
+  if (room && room !== booking.room?._id?.toString()) {
+    if (booking.room) {
+      const oldRoom = await Room.findById(booking.room._id);
+      if (oldRoom && oldRoom.status === "reserved") {
+        oldRoom.status = "available";
+        await oldRoom.save();
+      }
+    }
+    
+    const newRoom = await Room.findById(room);
+    if (newRoom) {
+      if (newRoom.status !== "available") {
+        res.status(400);
+        throw new Error("Selected room is not available");
+      }
+      newRoom.status = "reserved";
+      await newRoom.save();
+      booking.room = room;
+    }
+  }
+
+  // Update dates
   if (checkIn) booking.checkIn = checkIn;
   if (checkOut) booking.checkOut = checkOut;
   if (guestsCount) booking.guestsCount = guestsCount;
   if (specialRequests !== undefined) booking.specialRequests = specialRequests;
+  if (status) booking.status = status;
+  if (billingStatus) booking.billingStatus = billingStatus;
 
   if (checkIn || checkOut) {
     booking.nights = calcNights(booking.checkIn, booking.checkOut);
-    booking.totalAmount = booking.nights * booking.room.price;
+    const roomDoc = await Room.findById(booking.room);
+    if (roomDoc) {
+      booking.totalAmount = booking.nights * roomDoc.price;
+    }
   }
 
   await booking.save();
-  res.json({ success: true, booking });
+  
+  const populated = await booking.populate([
+    { path: "room" },
+    { path: "guest", select: "name email phone" },
+  ]);
+
+  res.json({ success: true, booking: populated });
 });
 
 // @desc  Delete/cancel booking

@@ -24,10 +24,10 @@ const getDashboardPath = (role) =>{
                 case ROLES.RECEPTIONIST:
                 return "/receptionist/dashboard"
                 case ROLES.HOUSEKEEPING:
-                    return "houseKepping/dashboard"
+                    return "/housekeeping/dashboard"
                     case ROLES.GUEST:
                         default:
-                            return "guest/dashboard"
+                            return "/"
     }
 }
 

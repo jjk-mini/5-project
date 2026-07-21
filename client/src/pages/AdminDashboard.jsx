@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import AsideBar from "../components/AsideBar";
+import bookingApi from "../api/bookingApi";
+import reportApi from "../api/reportApi";
 import { Link } from "react-router-dom";
 import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
 import {
@@ -31,23 +33,6 @@ import {
   Cell,
   Legend,
 } from "recharts";
-
-const weeklyOccupancy = [
-  { day: "Mon", occupancy: 68 },
-  { day: "Tue", occupancy: 74 },
-  { day: "Wed", occupancy: 79 },
-  { day: "Thu", occupancy: 83 },
-  { day: "Fri", occupancy: 90 },
-  { day: "Sat", occupancy: 95 },
-  { day: "Sun", occupancy: 82 },
-];
-
-const roomStatus = [
-  { name: "Occupied", value: 42 },
-  { name: "Available", value: 21 },
-  { name: "Cleaning", value: 9 },
-  { name: "Maintenance", value: 4 },
-];
 
 const ROOM_STATUS_COLORS = [COLORS.PRIMARY, COLORS.ACCENT, COLORS.INFO, COLORS.WARNING];
 
@@ -91,19 +76,50 @@ function AdminDashboard() {
   const [recentActivity, setRecentActivity] = useState([]);
   const [activityLoading, setActivityLoading] = useState(true);
 
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [roomStatus, setRoomStatus] = useState([]);
+  const [weeklyOccupancy, setWeeklyOccupancy] = useState([]);
+  const [statsLoading, setStatsLoading] = useState(true);
+
   useEffect(() => {
     const fetchActivity = async () => {
       setActivityLoading(true);
       try {
         const res = await bookingApi.getTodayActivity();
-        setRecentActivity(res.data.activity || res.data.bookings || res.data || []);
+        const { checkinsToday = [], checkoutsToday = [] } = res.data || {};
+        const formatTime = (d) => (d ? new Date(d).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "\u2014");
+        const merged = [
+          ...checkinsToday.map((b) => ({ ...b, status: b.status === "checked-in" ? "checked-in" : "confirmed", time: formatTime(b.checkIn), sortKey: b.checkIn })),
+          ...checkoutsToday.map((b) => ({ ...b, status: "checked-out", time: formatTime(b.checkOut), sortKey: b.checkOut })),
+        ]
+          .sort((a, b) => new Date(b.sortKey) - new Date(a.sortKey))
+          .map(mapActivityItem);
+        setRecentActivity(merged);
       } catch {
         setRecentActivity([]);
       } finally {
         setActivityLoading(false);
       }
     };
+
+    const fetchStats = async () => {
+      setStatsLoading(true);
+      try {
+        const res = await reportApi.getDashboardStats();
+        setDashboardStats(res.data.stats || null);
+        setRoomStatus(res.data.roomStatus || []);
+        setWeeklyOccupancy(res.data.weeklyOccupancy || []);
+      } catch {
+        setDashboardStats(null);
+        setRoomStatus([]);
+        setWeeklyOccupancy([]);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
     fetchActivity();
+    fetchStats();
   }, []);
 
   const dashboardOptions = [
@@ -113,10 +129,10 @@ function AdminDashboard() {
   ];
 
   const stats = [
-    { label: "Occupancy", value: "82%", icon: Percent, color: COLORS.INFO },
-    { label: "Revenue", value: "$3240", icon: DollarSign, color: COLORS.SUCCESS },
-    { label: "Total Rooms", value: "7", icon: BedDouble, color: COLORS.PRIMARY },
-    { label: "Bookings Today", value: "24", icon: CalendarCheck, color: COLORS.WARNING },
+    { label: "Occupancy", value: statsLoading ? "\u2014" : `${dashboardStats?.occupancyRate ?? 0}%`, icon: Percent, color: COLORS.INFO },
+    { label: "Revenue", value: statsLoading ? "\u2014" : `$${(dashboardStats?.revenueToday ?? 0).toLocaleString()}`, icon: DollarSign, color: COLORS.SUCCESS },
+    { label: "Total Rooms", value: statsLoading ? "\u2014" : `${dashboardStats?.totalRooms ?? 0}`, icon: BedDouble, color: COLORS.PRIMARY },
+    { label: "Bookings Today", value: statsLoading ? "\u2014" : `${dashboardStats?.bookingsToday ?? 0}`, icon: CalendarCheck, color: COLORS.WARNING },
   ];
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -344,6 +360,12 @@ function AdminDashboard() {
                 </h2>
                 <span className="text-xs" style={{ color: COLORS.MUTED }}>Today</span>
               </div>
+
+              {!activityLoading && recentActivity.length === 0 && (
+                <p className="py-6 text-sm text-center" style={{ color: COLORS.MUTED }}>
+                  No check-ins or check-outs yet today.
+                </p>
+              )}
 
               <ul>
                 {recentActivity.map((entry, index) => (

@@ -608,7 +608,7 @@ export default function AboutUsPage() {
                     <ArrowRightIcon className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                   <Link
-                    to="/services"
+                    to="/homeservice"
                     className="inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300 hover:bg-white/10"
                     style={{
                       color: COLORS.CREAM,

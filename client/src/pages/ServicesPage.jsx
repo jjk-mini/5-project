@@ -146,7 +146,7 @@ function ServicesPage() {
       </div>
     </div>
 
-    <Link
+    {/* <Link
       to="/services/newService"
       style={{
         background: COLORS.ACCENT,
@@ -161,7 +161,7 @@ function ServicesPage() {
       }}
     >
       + New Service
-    </Link>
+    </Link> */}
 
   </div>
 </div>

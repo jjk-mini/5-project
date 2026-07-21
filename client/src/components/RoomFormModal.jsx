@@ -14,10 +14,7 @@ const emptyForm = {
   status: ROOM_STATUS.AVAILABLE,
   image: null,
 };
-// mode = 'add' | 'edit'
-// room = existing room object (edit mode only)
-// onSave(formValues) is called by the parent to create/update
-// onDelete(id) is called by the parent to delete (edit mode only)
+
 const RoomFormModal = ({ mode, room, onClose, onSave, onDelete, saving }) => {
   const [form, setForm] = useState(emptyForm);
   const [preview, setPreview] = useState(null);

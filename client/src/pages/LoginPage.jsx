@@ -20,7 +20,7 @@ const getDashboardPath = (role) => {
     case ROLES.HOUSEKEEPING:
       return "/housekeeping/dashboard";
     case ROLES.GUEST:
-      return "/guest/dashboard";
+      return "/";
     default:
       return "/";
   }

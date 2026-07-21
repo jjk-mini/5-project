@@ -25,12 +25,15 @@ const SIDEBAR_LINKS = {
     { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
     { name: "Staff", icon: UserCog, path: "/admin/staff-management" },
     { name: "Maintenance", icon: Wrench, path: "/housekeeping/maintenance" },
-    { name: "Requests", icon: ClipboardList, path: "/housekeeping/dashboard" },
+    { name: "HouseKeeping", icon: ClipboardList, path: "/housekeeping/dashboard" },
     { name: "Rooms", icon: BedDouble, path: "/admin/rooms" },
-    { name: "Services", icon: ConciergeBell, path: "/admin/services" },
+    { name: "RequestService", icon: ConciergeBell, path:"/admin/services" },
+    { name: "Services", icon: CircleUserRound, path: "/admin/services/catalog" },
     { name: "Bookings", icon: CalendarCheck, path: "/admin/bookings" },
+    { name: "Billing", icon: CreditCard, path: "/admin/billing" },
     { name: "Reports", icon: BarChart2, path: "/admin/reports" },
     { name: "Profile", icon: CircleUserRound, path: "/profile" },
+    
   ],
 
   [ROLES.MANAGER]: [
@@ -41,6 +44,7 @@ const SIDEBAR_LINKS = {
     // { name: "Rooms", icon: BedDouble, path: "/admin/rooms" },
     // { name: "Services", icon: ConciergeBell, path: "/admin/services" },
     { name: "Bookings", icon: CalendarCheck, path: "/admin/bookings" },
+        { name: "Billing", icon: CreditCard, path: "/admin/billing" },
     // { name: "Reports", icon: BarChart2, path: "/admin/reports" },
     { name: "Profile", icon: CircleUserRound, path: "/profile" },
     
@@ -48,7 +52,7 @@ const SIDEBAR_LINKS = {
 
   [ROLES.RECEPTIONIST]: [
     { name: "Dashboard", icon: LayoutDashboard, path: "/receptionist/dashboard" },
-    { name: "Rooms", icon: BedDouble, path: "/receptionist/rooms" },
+    { name: "Rooms", icon: BedDouble, path: "/admin/rooms" },
     { name: "Bookings", icon: CalendarCheck, path: "/receptionist/bookings" },
     { name: "Check In/Out", icon: ClipboardCheck, path: "/receptionist/checkinout" },
     { name: "Billing", icon: CreditCard, path: "/receptionist/billing" },

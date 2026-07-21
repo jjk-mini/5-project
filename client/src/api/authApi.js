@@ -5,4 +5,10 @@ export const authApi = {
   login: (data) => axiosClient.post("/auth/login", data),
   getCurrentUser: () => axiosClient.get("/auth/me"),
 };
- 
+export const registerUser = (userData) => {
+  return axiosClient.post("/auth/register", userData);
+};
+
+export const getUsers = (params) => {
+  return axiosClient.get("/users", { params });
+};

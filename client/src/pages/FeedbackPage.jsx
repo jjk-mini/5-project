@@ -7,6 +7,10 @@ import {
   MessageSquare,
   User,
   CalendarDays,
+  Sparkles,
+  Quote,
+  Heart,
+  Send,
 } from "lucide-react";
 
 import {
@@ -61,6 +65,7 @@ function FeedbackPage() {
         icon: "warning",
         title: "Rating Required",
         text: "Please select a rating.",
+        confirmButtonColor: COLORS.PRIMARY,
       });
       return;
     }
@@ -70,6 +75,7 @@ function FeedbackPage() {
         icon: "warning",
         title: "Feedback Required",
         text: "Please enter your feedback.",
+        confirmButtonColor: COLORS.PRIMARY,
       });
       return;
     }
@@ -100,267 +106,671 @@ function FeedbackPage() {
         icon: "error",
         title: "Oops!",
         text: "Failed to submit feedback.",
+        confirmButtonColor: COLORS.PRIMARY,
       });
     }
   };
 
+  const inputStyle = {
+    width: "100%",
+    padding: "15px 17px",
+    borderRadius: BORDER_RADIUS.MEDIUM,
+    border: `1px solid ${COLORS.BORDER}`,
+    background: COLORS.BACKGROUND,
+    color: COLORS.TEXT_PRIMARY,
+    fontFamily: FONTS.BODY,
+    fontSize: "14px",
+    outline: "none",
+    resize: "vertical",
+    transition: "all 0.3s ease",
+    boxSizing: "border-box",
+  };
+
   return (
-    <div
-      className="min-h-screen flex"
+    <main
       style={{
+        minHeight: "100vh",
         background: COLORS.BACKGROUND,
+        padding: "60px 24px 80px",
         fontFamily: FONTS.BODY,
       }}
     >
-      <main className="flex-1 overflow-y-auto p-8">
-
-        {/* Header */}
-
+      {/* PAGE HEADER */}
+      <section
+        style={{
+          maxWidth: "1100px",
+          margin: "0 auto 40px",
+          textAlign: "center",
+        }}
+      >
         <div
-          className="mb-8 p-8"
           style={{
-            background: `linear-gradient(135deg, ${COLORS.PRIMARY}, #3B2F28)`,
-            borderRadius: BORDER_RADIUS.LARGE,
-            boxShadow: SHADOWS.CARD,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "7px 16px",
+            borderRadius: BORDER_RADIUS.PILL,
+            background: "rgba(200, 169, 106, 0.12)",
+            border: `1px solid rgba(200, 169, 106, 0.3)`,
+            color: COLORS.ACCENT,
+            fontSize: "11px",
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            marginBottom: "18px",
           }}
         >
-          <h1
-            className="text-4xl font-bold"
-            style={{
-              color: COLORS.CREAM,
-              fontFamily: FONTS.HEADING,
-            }}
-          >
-            Guest Feedback
-          </h1>
-
-          <p
-            className="mt-3 text-lg"
-            style={{
-              color: COLORS.ACCENT,
-            }}
-          >
-            Share your experience and help us improve our luxury hospitality.
-          </p>
+          <Sparkles size={14} />
+          Your experience matters
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <h1
+          style={{
+            margin: "0 0 14px",
+            color: COLORS.TEXT_PRIMARY,
+            fontFamily: FONTS.HEADING,
+            fontSize: "clamp(36px, 5vw, 58px)",
+            fontWeight: 400,
+            letterSpacing: "-0.03em",
+          }}
+        >
+          Guest Feedback
+        </h1>
 
-          {/* Left Card */}
+        <p
+          style={{
+            maxWidth: "600px",
+            margin: "0 auto",
+            color: COLORS.TEXT_SECONDARY,
+            fontSize: "15px",
+            lineHeight: 1.8,
+          }}
+        >
+          Your thoughts help us create more memorable stays and deliver the
+          exceptional hospitality you deserve.
+        </p>
+      </section>
 
+      {/* MAIN CONTENT */}
+      <section
+        style={{
+          maxWidth: "1100px",
+          margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 0.9fr) minmax(0, 1.1fr)",
+          gap: "28px",
+          alignItems: "stretch",
+        }}
+      >
+        {/* LEFT — FEEDBACK FORM */}
+        <div
+          style={{
+            background: COLORS.SURFACE,
+            borderRadius: BORDER_RADIUS.LARGE,
+            border: `1px solid ${COLORS.BORDER}`,
+            boxShadow: SHADOWS.CARD,
+            overflow: "hidden",
+          }}
+        >
+          {/* FORM HEADER */}
           <div
-            className="p-8"
             style={{
-              background: COLORS.SURFACE,
-              borderRadius: BORDER_RADIUS.LARGE,
-              borderLeft: `8px solid ${COLORS.ACCENT}`,
-              boxShadow: SHADOWS.CARD,
+              background: COLORS.PRIMARY,
+              padding: "34px 32px",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
-            <div className="flex items-center gap-3 mb-8">
-              <MessageSquare
-                size={35}
-                style={{ color: COLORS.PRIMARY }}
-              />
+            <div
+              style={{
+                position: "absolute",
+                width: "180px",
+                height: "180px",
+                borderRadius: "50%",
+                border: "1px solid rgba(200,169,106,0.15)",
+                right: "-70px",
+                top: "-80px",
+              }}
+            />
 
-              <h2
-                className="text-3xl font-bold"
+            <div
+              style={{
+                position: "relative",
+                zIndex: 1,
+              }}
+            >
+              <div
                 style={{
-                  color: COLORS.PRIMARY,
-                  fontFamily: FONTS.HEADING,
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: BORDER_RADIUS.MEDIUM,
+                  background: "rgba(200, 169, 106, 0.15)",
+                  border: "1px solid rgba(200, 169, 106, 0.3)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginBottom: "20px",
                 }}
               >
-                Leave Feedback
-              </h2>
-            </div>
+                <MessageSquare
+                  size={22}
+                  color={COLORS.ACCENT}
+                />
+              </div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-8"
+              <h2
+                style={{
+                  margin: "0 0 8px",
+                  color: COLORS.CREAM,
+                  fontFamily: FONTS.HEADING,
+                  fontSize: "30px",
+                  fontWeight: 400,
+                }}
+              >
+                Share your experience
+              </h2>
+
+              <p
+                style={{
+                  margin: 0,
+                  color: "rgba(248,246,243,0.65)",
+                  fontSize: "13px",
+                  lineHeight: 1.7,
+                }}
+              >
+                Tell us about your stay at LuxuryStay. Every review helps us
+                improve our service.
+              </p>
+            </div>
+          </div>
+
+          {/* FORM */}
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              padding: "32px",
+            }}
+          >
+            {/* USER INFO */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "14px",
+                padding: "14px",
+                marginBottom: "30px",
+                borderRadius: BORDER_RADIUS.MEDIUM,
+                background: COLORS.BACKGROUND,
+                border: `1px solid ${COLORS.BORDER}`,
+              }}
             >
+              <div
+                style={{
+                  width: "42px",
+                  height: "42px",
+                  borderRadius: "50%",
+                  background: COLORS.PRIMARY,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <User
+                  size={19}
+                  color={COLORS.ACCENT}
+                />
+              </div>
+
               <div>
-                <h3
-                  className="text-lg font-semibold mb-4"
+                <p
                   style={{
+                    margin: "0 0 3px",
                     color: COLORS.TEXT_PRIMARY,
+                    fontSize: "14px",
+                    fontWeight: 600,
                   }}
                 >
-                  Rate Your Stay
-                </h3>
+                  {user?.name || "Guest"}
+                </p>
 
-                <div className="flex gap-3">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
+                <p
+                  style={{
+                    margin: 0,
+                    color: COLORS.TEXT_SECONDARY,
+                    fontSize: "12px",
+                  }}
+                >
+                  Sharing your personal experience
+                </p>
+              </div>
+            </div>
+
+            {/* RATING */}
+            <div style={{ marginBottom: "30px" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "12px",
+                  color: COLORS.TEXT_PRIMARY,
+                  fontSize: "14px",
+                  fontWeight: 600,
+                }}
+              >
+                How was your stay?
+              </label>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "7px",
+                }}
+              >
+                {[1, 2, 3, 4, 5].map((star) => {
+                  const isActive = star <= (hover || rating);
+
+                  return (
+                    <button
                       key={star}
-                      size={42}
+                      type="button"
                       onMouseEnter={() => setHover(star)}
                       onMouseLeave={() => setHover(0)}
                       onClick={() => setRating(star)}
-                      className="cursor-pointer transition-all duration-300 hover:scale-110"
+                      aria-label={`${star} star rating`}
                       style={{
-                        fill:
-                          star <= (hover || rating)
+                        background: "transparent",
+                        border: "none",
+                        padding: "3px",
+                        cursor: "pointer",
+                        transition: "transform 0.2s ease",
+                        transform: isActive
+                          ? "scale(1.12)"
+                          : "scale(1)",
+                      }}
+                    >
+                      <Star
+                        size={36}
+                        strokeWidth={1.5}
+                        style={{
+                          fill: isActive
                             ? COLORS.ACCENT
                             : "transparent",
-                        color:
-                          star <= (hover || rating)
+                          color: isActive
                             ? COLORS.ACCENT
-                            : "#d1d5db",
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label
-                  className="block mb-3 text-lg font-semibold"
-                  style={{
-                    color: COLORS.TEXT_PRIMARY,
-                  }}
-                >
-                  Your Feedback
-                </label>
-
-                <textarea
-                  rows="7"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Tell us about your experience..."
-                  className="w-full p-4 outline-none transition"
-                  style={{
-                    borderRadius: BORDER_RADIUS.MEDIUM,
-                    border: `1px solid ${COLORS.BORDER}`,
-                    color: COLORS.TEXT_PRIMARY,
-                  }}
-                />
-
-                <button
-                  type="submit"
-                  className="mt-6 w-full py-4 text-white font-semibold transition hover:scale-[1.02]"
-                  style={{
-                    background: COLORS.PRIMARY,
-                    borderRadius: BORDER_RADIUS.MEDIUM,
-                    boxShadow: SHADOWS.CARD,
-                  }}
-                >
-                  Submit Feedback
-                </button>
-              </div>
-            </form>
-          </div>
-
-          {/* Reviews Card */}
-
-          <div
-            className="p-8"
-            style={{
-              background: COLORS.SURFACE,
-              borderRadius: BORDER_RADIUS.LARGE,
-              borderLeft: `8px solid ${COLORS.ACCENT}`,
-              boxShadow: SHADOWS.CARD,
-            }}
-          >
-            <h2
-              className="text-3xl font-bold mb-8"
-              style={{
-                color: COLORS.PRIMARY,
-                fontFamily: FONTS.HEADING,
-              }}
-            >
-              Guest Reviews
-            </h2>
-
-            <div className="space-y-6">
-              {reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="p-6"
-                  style={{
-                    background: COLORS.CREAM,
-                    borderRadius: BORDER_RADIUS.LARGE,
-                    boxShadow: SHADOWS.CARD,
-                  }}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-4">
-                      <div
-                        className="p-3 rounded-full"
-                        style={{
-                          background: COLORS.PRIMARY,
+                            : COLORS.MUTED,
                         }}
-                      >
-                        <User
-                          size={20}
-                          style={{
-                            color: COLORS.ACCENT,
-                          }}
-                        />
-                      </div>
+                      />
+                    </button>
+                  );
+                })}
+              </div>
 
-                      <div>
-                        <h3
-                          className="text-lg font-bold"
-                          style={{
-                            color: COLORS.PRIMARY,
-                            fontFamily: FONTS.HEADING,
-                          }}
-                        >
-                          {review.guest}
-                        </h3>
-
-                        <p
-                          className="text-sm"
-                          style={{
-                            color: COLORS.TEXT_SECONDARY,
-                          }}
-                        >
-                          {review.room}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-1">
-                      {[...Array(review.rating)].map((_, index) => (
-                        <Star
-                          key={index}
-                          size={18}
-                          style={{
-                            fill: COLORS.ACCENT,
-                            color: COLORS.ACCENT,
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <p
-                    className="mt-5 leading-7"
-                    style={{
-                      color: COLORS.TEXT_SECONDARY,
-                    }}
-                  >
-                    {review.comment}
-                  </p>
-
-                  <div
-                    className="flex items-center gap-2 mt-5 text-sm"
-                    style={{
-                      color: COLORS.MUTED,
-                    }}
-                  >
-                    <CalendarDays size={16} />
-                    {review.date}
-                  </div>
-                </div>
-              ))}
+              <p
+                style={{
+                  margin: "10px 0 0",
+                  color: COLORS.TEXT_SECONDARY,
+                  fontSize: "12px",
+                }}
+              >
+                {rating === 0
+                  ? "Select a rating from 1 to 5 stars"
+                  : `${rating} out of 5 stars selected`}
+              </p>
             </div>
 
-          </div>
-          </div>
-        </main>
+            {/* COMMENT */}
+            <div style={{ marginBottom: "24px" }}>
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "10px",
+                  color: COLORS.TEXT_PRIMARY,
+                  fontSize: "14px",
+                  fontWeight: 600,
+                }}
+              >
+                Your feedback
+              </label>
+
+              <textarea
+                rows="7"
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Tell us about your experience..."
+                style={inputStyle}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = COLORS.ACCENT;
+                  e.currentTarget.style.boxShadow =
+                    "0 0 0 3px rgba(200,169,106,0.12)";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = COLORS.BORDER;
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              />
+            </div>
+
+            {/* SUBMIT */}
+            <button
+              type="submit"
+              style={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "9px",
+                padding: "14px 20px",
+                border: "none",
+                borderRadius: BORDER_RADIUS.PILL,
+                background: COLORS.PRIMARY,
+                color: COLORS.CREAM,
+                fontFamily: FONTS.BODY,
+                fontSize: "14px",
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = COLORS.DARK;
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 8px 20px rgba(31,26,23,0.18)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = COLORS.PRIMARY;
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              Submit Feedback
+              <Send size={16} />
+            </button>
+          </form>
         </div>
-    
+
+        {/* RIGHT — REVIEWS */}
+        <div
+          style={{
+            background: COLORS.SURFACE,
+            borderRadius: BORDER_RADIUS.LARGE,
+            border: `1px solid ${COLORS.BORDER}`,
+            boxShadow: SHADOWS.CARD,
+            padding: "32px",
+          }}
+        >
+          {/* REVIEWS HEADER */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: "20px",
+              marginBottom: "28px",
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "9px",
+                  marginBottom: "9px",
+                }}
+              >
+                <Quote
+                  size={18}
+                  color={COLORS.ACCENT}
+                />
+
+                <span
+                  style={{
+                    color: COLORS.ACCENT,
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Guest stories
+                </span>
+              </div>
+
+              <h2
+                style={{
+                  margin: 0,
+                  color: COLORS.TEXT_PRIMARY,
+                  fontFamily: FONTS.HEADING,
+                  fontSize: "32px",
+                  fontWeight: 400,
+                }}
+              >
+                Guest Reviews
+              </h2>
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "7px",
+                padding: "9px 13px",
+                borderRadius: BORDER_RADIUS.PILL,
+                background: "rgba(200,169,106,0.1)",
+                color: COLORS.ACCENT,
+                fontSize: "12px",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <Heart
+                size={14}
+                fill={COLORS.ACCENT}
+              />
+              Loved by guests
+            </div>
+          </div>
+
+          {/* REVIEW CARDS */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+            }}
+          >
+            {reviews.map((review) => (
+              <article
+                key={review.id}
+                style={{
+                  padding: "22px",
+                  borderRadius: BORDER_RADIUS.LARGE,
+                  background: COLORS.BACKGROUND,
+                  border: `1px solid ${COLORS.BORDER}`,
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "translateY(-3px)";
+                  e.currentTarget.style.boxShadow = SHADOWS.CARD;
+                  e.currentTarget.style.borderColor =
+                    "rgba(200,169,106,0.45)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.style.borderColor = COLORS.BORDER;
+                }}
+              >
+                {/* REVIEW TOP */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    justifyContent: "space-between",
+                    gap: "14px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "42px",
+                        height: "42px",
+                        borderRadius: "50%",
+                        background: COLORS.PRIMARY,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <User
+                        size={18}
+                        color={COLORS.ACCENT}
+                      />
+                    </div>
+
+                    <div>
+                      <h3
+                        style={{
+                          margin: "0 0 3px",
+                          color: COLORS.TEXT_PRIMARY,
+                          fontFamily: FONTS.HEADING,
+                          fontSize: "18px",
+                          fontWeight: 500,
+                        }}
+                      >
+                        {review.guest}
+                      </h3>
+
+                      <p
+                        style={{
+                          margin: 0,
+                          color: COLORS.TEXT_SECONDARY,
+                          fontSize: "12px",
+                        }}
+                      >
+                        {review.room}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* STARS */}
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "2px",
+                    }}
+                  >
+                    {[...Array(review.rating)].map((_, index) => (
+                      <Star
+                        key={index}
+                        size={15}
+                        strokeWidth={1.5}
+                        style={{
+                          fill: COLORS.ACCENT,
+                          color: COLORS.ACCENT,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* REVIEW TEXT */}
+                <p
+                  style={{
+                    margin: "18px 0",
+                    color: COLORS.TEXT_SECONDARY,
+                    fontSize: "13px",
+                    lineHeight: 1.8,
+                  }}
+                >
+                  “{review.comment}”
+                </p>
+
+                {/* REVIEW DATE */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "7px",
+                    paddingTop: "13px",
+                    borderTop: `1px solid ${COLORS.BORDER}`,
+                    color: COLORS.MUTED,
+                    fontSize: "11px",
+                  }}
+                >
+                  <CalendarDays size={14} />
+                  {review.date}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* BOTTOM MESSAGE */}
+      <section
+        style={{
+          maxWidth: "1100px",
+          margin: "30px auto 0",
+          padding: "24px",
+          borderRadius: BORDER_RADIUS.LARGE,
+          background: COLORS.PRIMARY,
+          textAlign: "center",
+          boxShadow: SHADOWS.CARD,
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            color: "rgba(248,246,243,0.75)",
+            fontSize: "13px",
+            lineHeight: 1.7,
+          }}
+        >
+          Thank you for choosing{" "}
+          <span
+            style={{
+              color: COLORS.ACCENT,
+              fontFamily: FONTS.HEADING,
+              fontSize: "17px",
+            }}
+          >
+            LuxuryStay
+          </span>
+          . Your feedback helps us continue creating exceptional experiences.
+        </p>
+      </section>
+
+      {/* RESPONSIVE STYLE */}
+      <style>
+        {`
+          @media (max-width: 900px) {
+            section[style*="grid-template-columns"] {
+              grid-template-columns: 1fr !important;
+            }
+          }
+
+          @media (max-width: 600px) {
+            main {
+              padding: 40px 16px 60px !important;
+            }
+
+            section[style*="padding: 32px"] {
+              padding: 24px !important;
+            }
+
+            h1 {
+              font-size: 38px !important;
+            }
+          }
+        `}
+      </style>
+    </main>
   );
 }
 

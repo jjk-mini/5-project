@@ -2,9 +2,9 @@
 
 export const COLORS = {
   // Main Brand Colors
-  PRIMARY: "#1F1A17",        // Rich Espresso
-  ACCENT: "#C8A96A",         // Champagne Gold
-  CREAM: "#F8F6F3",          // Warm Ivory
+  PRIMARY: "#1F1A17",        
+  ACCENT: "#C8A96A",         
+  CREAM: "#F8F6F3",          
 
   // Backgrounds
   BACKGROUND: "#F8F6F3",     // Main page background

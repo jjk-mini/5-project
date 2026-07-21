@@ -7,10 +7,8 @@ const SpecialRequests = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Backend baad me connect karenge
     console.log(request);
 
-    // UI ke liye abhi textbox clear kar do
     setRequest("");
   };
 

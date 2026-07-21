@@ -7,18 +7,15 @@ const {
   deleteStaff,
 } = require("../controllers/staffController");
 
+const { protect, authorizeRoles } = require("../middleware/authMiddleware");
+
 const router = express.Router();
 
-// Get all staff
-router.get("/", getStaff);
-
-// Add new staff
-router.post("/", addStaff);
-
-// Update staff
-router.put("/:id", updateStaff);
-
-// Delete staff
-router.delete("/:id", deleteStaff);
+// Admin-only: this is the only way staff accounts get created.
+// There is no self-registration path for staff roles.
+router.get("/", protect, authorizeRoles("admin"), getStaff);
+router.post("/", protect, authorizeRoles("admin"), addStaff);
+router.put("/:id", protect, authorizeRoles("admin"), updateStaff);
+router.delete("/:id", protect, authorizeRoles("admin"), deleteStaff);
 
 module.exports = router;

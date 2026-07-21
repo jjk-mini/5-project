@@ -20,11 +20,11 @@ const HOTEL_LINKS = [
 ];
 
 const SERVICE_LINKS = [
-  { label: "Room service",   path: "/services" },
-  { label: "Housekeeping",   path: "/services" },
-  { label: "Transportation", path: "/services" },
-  { label: "Concierge",      path: "/services" },
-  { label: "Events",         path: "/services" },
+  { label: "Room service",   path: "/homeservice" },
+  { label: "Housekeeping",   path: "/homeservice" },
+  { label: "Transportation", path: "/homeservice" },
+  { label: "Concierge",      path: "/homeservice" },
+  { label: "Events",         path: "/homeservice" },
 ];
 
 const CONTACT_INFO = [

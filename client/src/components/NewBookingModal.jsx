@@ -30,8 +30,7 @@ const EMPTY_FORM = {
   notes: "",
 };
 
-// Shared input styling — Tailwind handles layout/spacing/responsiveness,
-// inline color values come from the theme so it stays on-brand.
+
 const fieldStyle = {
   fontFamily: FONTS.BODY,
   color: COLORS.TEXT_PRIMARY,
@@ -63,7 +62,7 @@ export default function NewBookingModal({ isOpen, onClose, onBookingCreated }) {
   const firstFieldRef = useRef(null);
   const dialogRef = useRef(null);
 
-  // Lock background scroll + focus first field + close on Escape while open
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -82,7 +81,7 @@ export default function NewBookingModal({ isOpen, onClose, onBookingCreated }) {
     };
   }, [isOpen, onClose]);
 
-  // Reset the form each time the modal is freshly opened
+ 
   useEffect(() => {
     if (isOpen) setForm(EMPTY_FORM);
   }, [isOpen]);

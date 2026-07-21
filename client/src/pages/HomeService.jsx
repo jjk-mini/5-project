@@ -431,7 +431,7 @@ const Services = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <Link
-              to="/booking"
+              to="/rooms"
               className="inline-flex items-center gap-3 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300 hover:scale-105 group"
               style={{
                 background: COLORS.ACCENT,
@@ -446,7 +446,7 @@ const Services = () => {
               />
             </Link>
             <Link
-              to="/services"
+              to="/homeservice"
               className="inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300 hover:bg-white/10"
               style={{
                 color: COLORS.CREAM,
