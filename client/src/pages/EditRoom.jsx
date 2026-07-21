@@ -21,6 +21,7 @@ function EditRoom() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [currentImage, setCurrentImage] = useState(null);
 
   const [formData, setFormData] = useState({
     roomNumber: "",
@@ -55,6 +56,8 @@ function EditRoom() {
           description: room.description || "",
           image: null,
         });
+
+        setCurrentImage(room.image || null);
       } catch (error) {
         console.error(
           "Failed to load room:",
@@ -88,10 +91,16 @@ function EditRoom() {
   // HANDLE IMAGE
   // =========================
   const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
     setFormData((previous) => ({
       ...previous,
-      image: e.target.files[0],
+      image: file,
     }));
+
+    // Preview the newly picked file immediately instead of the old image
+    setCurrentImage(URL.createObjectURL(file));
   };
 
   // =========================
@@ -148,6 +157,11 @@ function EditRoom() {
       </div>
     );
   }
+
+  const inputStyle = {
+    border: `1px solid ${COLORS.BORDER}`,
+    borderRadius: BORDER_RADIUS.MEDIUM,
+  };
 
  return (
 
@@ -233,11 +247,176 @@ function EditRoom() {
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
 
-      {/* KEEP ALL YOUR EXISTING INPUT FIELDS HERE EXACTLY AS THEY ARE */}
+      {/* Room Number */}
+      <div>
+        <label className="block mb-2 font-semibold">Room Number</label>
+        <input
+          type="text"
+          name="roomNumber"
+          value={formData.roomNumber}
+          onChange={handleChange}
+          placeholder="Example: 101"
+          required
+          className="w-full px-4 py-3 outline-none"
+          style={inputStyle}
+        />
+      </div>
+
+      {/* Room Type */}
+      <div>
+        <label className="block mb-2 font-semibold">Room Type</label>
+        <select
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          required
+          className="w-full px-4 py-3 outline-none"
+          style={inputStyle}
+        >
+          <option value="">Select Room Type</option>
+          <option value="Standard">Standard</option>
+          <option value="Deluxe">Deluxe</option>
+          <option value="Suite">Suite</option>
+          <option value="Executive">Executive</option>
+          <option value="Presidential">Presidential</option>
+        </select>
+      </div>
+
+      {/* Floor */}
+      <div>
+        <label className="block mb-2 font-semibold">Floor</label>
+        <input
+          type="number"
+          name="floor"
+          value={formData.floor}
+          onChange={handleChange}
+          placeholder="Example: 1"
+          required
+          className="w-full px-4 py-3 outline-none"
+          style={inputStyle}
+        />
+      </div>
+
+      {/* Area */}
+      <div>
+        <label className="block mb-2 font-semibold">Area</label>
+        <input
+          type="text"
+          name="area"
+          value={formData.area}
+          onChange={handleChange}
+          placeholder="Example: 450 sq ft"
+          className="w-full px-4 py-3 outline-none"
+          style={inputStyle}
+        />
+      </div>
+
+      {/* Guests */}
+      <div>
+        <label className="block mb-2 font-semibold">Maximum Guests</label>
+        <input
+          type="number"
+          name="guests"
+          value={formData.guests}
+          onChange={handleChange}
+          placeholder="Example: 2"
+          required
+          min="1"
+          className="w-full px-4 py-3 outline-none"
+          style={inputStyle}
+        />
+      </div>
+
+      {/* Price */}
+      <div>
+        <label className="block mb-2 font-semibold">Price Per Night</label>
+        <input
+          type="number"
+          name="price"
+          value={formData.price}
+          onChange={handleChange}
+          placeholder="Example: 25000"
+          required
+          min="0"
+          className="w-full px-4 py-3 outline-none"
+          style={inputStyle}
+        />
+      </div>
+
+      {/* Status */}
+      <div>
+        <label className="block mb-2 font-semibold">Status</label>
+        <select
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+          className="w-full px-4 py-3 outline-none"
+          style={inputStyle}
+        >
+          <option value="available">Available</option>
+          <option value="occupied">Occupied</option>
+          <option value="reserved">Reserved</option>
+          <option value="cleaning">Cleaning</option>
+          <option value="maintenance">Maintenance</option>
+        </select>
+      </div>
+
+      {/* Image */}
+      <div>
+        <label className="block mb-2 font-semibold">Room Image</label>
+
+        <div className="relative">
+          <ImagePlus
+            size={20}
+            className="absolute left-3 top-3.5"
+            style={{ color: COLORS.TEXT_SECONDARY }}
+          />
+
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full pl-10 pr-4 py-3 outline-none"
+            style={inputStyle}
+          />
+        </div>
+
+        <p className="text-sm mt-2" style={{ color: COLORS.TEXT_SECONDARY }}>
+          Leave empty to keep the current image.
+        </p>
+
+        {currentImage && (
+          <img
+            src={currentImage}
+            alt="Room preview"
+            style={{
+              marginTop: "10px",
+              width: "160px",
+              height: "110px",
+              objectFit: "cover",
+              borderRadius: BORDER_RADIUS.MEDIUM,
+              border: `1px solid ${COLORS.BORDER}`,
+            }}
+          />
+        )}
+      </div>
 
     </div>
 
-    {/* KEEP YOUR DESCRIPTION EXACTLY AS IT IS */}
+    {/* Description */}
+    <div className="mt-6">
+      <label className="block mb-2 font-semibold">Description</label>
+      <textarea
+        name="description"
+        value={formData.description}
+        onChange={handleChange}
+        rows="5"
+        placeholder="Describe the room..."
+        className="w-full px-4 py-3 outline-none resize-none"
+        style={inputStyle}
+      />
+    </div>
 
     {/* BUTTONS */}
     <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 mt-8">

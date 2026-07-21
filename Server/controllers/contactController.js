@@ -1,6 +1,6 @@
 // Contact controller — public contact form submissions
 const asyncHandler = require("express-async-handler");
-const Contact = require("../models/Contact");
+const Contact = require("../models/contact");
 
 const submitContactForm = asyncHandler(async (req, res) => {
   const { firstName, lastName, email, phone, subject, message } = req.body;

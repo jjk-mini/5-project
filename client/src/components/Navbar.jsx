@@ -18,7 +18,7 @@ import {
 
 const PUBLIC_LINKS = [
   { label: "Home", path: "/" },
-  // { label: "Rooms", path: "/rooms" },
+  { label: "Rooms", path: "/rooms" },
   { label: "About", path: "/#about" },
   { label: "Services", path: "/services" },
   { label: "Contact", path: "/contact" },
@@ -30,7 +30,7 @@ const PUBLIC_LINKS = [
 const GUEST_LINKS = [
   { label: "Home", path: "/" },
   { label: "About", path: "/#about" },
-  { label: "Services", path: "/services" },
+  { label: "Services", path: "/HomeService" },
   { label: "Contact", path: "/contact" },
   { label: "Gallery", path: "/gallery" },
   { label: "Rooms", path: "/rooms" },

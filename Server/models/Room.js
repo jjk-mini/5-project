@@ -52,7 +52,7 @@ const roomSchema = new mongoose.Schema(
       default: "",
     },
 
-    view: {
+    bar: {
       type: String,
       default: "",
     },

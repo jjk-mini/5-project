@@ -19,6 +19,8 @@ roomNumber: "",
 type: "",
 floor: "",
 area: "",
+bed:"",
+bar:"",
 guests: "",
 price: "",
 status: "available",
@@ -60,6 +62,8 @@ try {
   data.append("type", formData.type);
   data.append("floor", formData.floor);
   data.append("area", formData.area);
+  data.append("bed", formData.bed);
+  data.append("bar", formData.bar);
   data.append("guests", formData.guests);
   data.append("price", formData.price);
   data.append("status", formData.status);
@@ -275,6 +279,65 @@ fontFamily: FONTS.BODY,
               borderRadius: BORDER_RADIUS.MEDIUM,
             }}
           />
+
+        </div>
+{/* bed */}
+          <div>
+          <label className="block mb-2 font-semibold">
+            Bed
+          </label>
+
+          <select
+            name="bed"
+            value={formData.bed}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 outline-none"
+            style={{
+              border: `1px solid ${COLORS.BORDER}`,
+              borderRadius: BORDER_RADIUS.MEDIUM,
+            }}
+          >
+            <option value="">
+              Select Bed Type
+            </option>
+
+            <option value="Single">
+              Single
+            </option>
+
+            <option value="Double">
+              Double
+            </option>
+
+            <option value="Queen">
+              Queen
+            </option>
+
+            <option value="King">
+              King
+            </option>
+          </select>
+        </div>
+{/* bar */}
+         <div>
+          <label className="block mb-2 font-semibold">
+            Bar
+          </label>
+
+          <input
+            type="text"
+            name="bar"
+            value={formData.bar}
+            onChange={handleChange}
+            placeholder="Example: Snacks"
+            className="w-full px-4 py-3 outline-none"
+            style={{
+              border: `1px solid ${COLORS.BORDER}`,
+              borderRadius: BORDER_RADIUS.MEDIUM,
+            }}
+          />
+          
         </div>
 
         {/* Guests */}

@@ -2,6 +2,7 @@
 const asyncHandler = require("express-async-handler");
 const Room = require("../models/Room");
 const cloudinary = require("../config/cloudinary");
+const uploadBufferToCloudinary = require("../utils/uploadBufferToCloudinary");
 
 // GET /api/rooms
 const getRooms = asyncHandler(async (req, res) => {
@@ -78,6 +79,7 @@ const createRoom = asyncHandler(async (req, res) => {
     guests,
     size,
     bed,
+    bar,
     view,
     highlights,
   } = req.body;
@@ -88,6 +90,10 @@ const createRoom = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Room number already exists");
   }
+
+  // req.file only has a buffer in memory (multer memoryStorage) — it must
+  // be uploaded to Cloudinary before we have a real, persistent URL to save.
+  const uploadResult = await uploadBufferToCloudinary(req.file.buffer);
 
 const room = await Room.create({
   roomNumber,
@@ -101,9 +107,10 @@ const room = await Room.create({
   guests,
   size,
   bed,
+  bar,
   view,
   highlights,
-  image: req.file ? req.file.path : "",
+  image: uploadResult.secure_url,
 });
 
   res.status(201).json({
@@ -133,6 +140,7 @@ const {
   guests,
   size,
   bed,
+  bar,
   view,
   highlights,
 } = req.body;
@@ -148,11 +156,13 @@ room.amenities = amenities ?? room.amenities;
 room.guests = guests ?? room.guests;
 room.size = size ?? room.size;
 room.bed = bed ?? room.bed;
+room.bar = bed ?? room.bar;
 room.view = view ?? room.view;
 room.highlights = highlights ?? room.highlights;
 
   if (req.file) {
-    room.image = req.file.path;
+    const uploadResult = await uploadBufferToCloudinary(req.file.buffer);
+    room.image = uploadResult.secure_url;
   }
 
   const updatedRoom = await room.save();

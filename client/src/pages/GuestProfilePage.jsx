@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
-
+import { useNavigate, Link } from "react-router-dom";
 import {
   User,
   Mail,
@@ -34,6 +33,8 @@ import {
   ArrowRight,
   Upload,
   X,
+  Wrench,
+  ArrowLeft,
 } from "lucide-react";
 
 // import AsideBarGuest from "../components/AsidebarGuest";
@@ -53,6 +54,8 @@ import {
   SHADOWS,
 } from "../constants/theme";
 
+import GuestServices from "./GuestServices";
+import ServiceRequestPage from "./componnts/ServicesRequestPage";
 import ProfileHeader from "./componnts/ProfileHeader";
 import TabButton from "./componnts/TabButton";
 import BookingCard from "./componnts/BookingCard";
@@ -66,6 +69,7 @@ import ProfileSection from "./componnts/ProfileSection";
 
 function GuestProfilePage() {
   const { user: authUser } = useAuth();
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState(authUser || {});
   const [loading, setLoading] = useState(true);
@@ -89,7 +93,6 @@ function GuestProfilePage() {
     newPassword: false,
     confirmPassword: false,
   });
-const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
 
@@ -110,6 +113,7 @@ const navigate = useNavigate();
       setError(
         err.response?.data?.message ||
           "Unable to load profile"
+        
       );
     } finally {
       setLoading(false);
@@ -199,7 +203,7 @@ const navigate = useNavigate();
 
       setProfile((previous) => ({
         ...previous,
-        profileImage: data.user.profileImage,
+        profileImage: data.profileImage,
       }));
 
       const savedUser = JSON.parse(
@@ -210,7 +214,7 @@ const navigate = useNavigate();
         "user",
         JSON.stringify({
           ...savedUser,
-         profileImage: data.user.profileImage,
+          profileImage: data.profileImage,
         })
       );
 
@@ -282,29 +286,27 @@ const navigate = useNavigate();
   }
 
   return (
-
-    
     <PageShell>
       <div className="mx-auto w-full max-w-[1280px]">
-
-           <div className="mt-4 mb-2">
-      <button
-        type="button"
-        onClick={() => navigate("/")}
-        style={{
-       color: COLORS.ACCENT,
-      textDecoration: "none",
-      fontSize: 14,
-      fontWeight: 600,
-      display: "inline-flex",
-      alignItems: "center",
-      gap: 6,
-      marginBottom: 24,
-        }}
-      >
-       ←  Back to Rooms
-      </button>
-    </div>
+        {/* Go to Home Button - Clean Version */}
+        <div className="mb-6">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm transition-all duration-300 hover:gap-3"
+            style={{
+              color: COLORS.TEXT_SECONDARY,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = COLORS.ACCENT;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = COLORS.TEXT_SECONDARY;
+            }}
+          >
+            <ArrowLeft size={18} style={{ color: COLORS.ACCENT }} />
+            <span className="font-medium">Back to Home</span>
+          </Link>
+        </div>
 
         <ProfileHero
           profile={profile}
@@ -315,8 +317,6 @@ const navigate = useNavigate();
             fileInputRef.current?.click()
           }
         />
-       
-
 
         <input
           ref={fileInputRef}
@@ -368,6 +368,7 @@ const navigate = useNavigate();
             onClick={() => setTab("profile")}
           />
 
+
           <TabButton
             label="Security"
             icon={KeyRound}
@@ -382,7 +383,19 @@ const navigate = useNavigate();
               active={tab === "services"}
               onClick={() => setTab("services")}
             />
+          )
+          }
+
+          {isGuest && (
+            <TabButton
+              label="Maintenance"
+              icon={Wrench}
+              active={tab === "maintenance"}
+              onClick={() => setTab("maintenance")}
+            /> 
           )}
+
+
         </div>
 
         {isGuest && tab === "stay" && (
@@ -413,6 +426,10 @@ const navigate = useNavigate();
         {isGuest && tab === "services" && (
           <GuestServicesContent />
         )}
+
+        {isGuest && tab === "maintenance" && (
+  <ServiceRequestPage />
+)}
       </div>
     </PageShell>
   );
@@ -434,7 +451,7 @@ function PageShell({ children }) {
         fontFamily: FONTS.BODY,
       }}
     >
-      {/* <AsideBarGuest /> */}
+      
 
       <main className="min-w-0 flex-1 px-4 py-5 sm:px-7 lg:px-10 lg:py-8">
         {children}
@@ -1312,6 +1329,7 @@ function SecurityContent({
 }
 
 function GuestServicesContent() {
+  const navigate = useNavigate();
   const services = [
     {
       icon: Coffee,
@@ -1364,6 +1382,7 @@ function GuestServicesContent() {
           Discover services designed to make your stay
           more comfortable.
         </p>
+        
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -1374,6 +1393,21 @@ function GuestServicesContent() {
           />
         ))}
       </div>
+<div className="mt-8">
+  <button
+    type="button"
+    onClick={() => navigate("/guest/services")}
+    className="w-full flex items-center justify-center gap-2 rounded-xl py-4 text-sm font-bold transition-transform hover:-translate-y-0.5"
+    style={{
+      background: COLORS.PRIMARY,
+      color: COLORS.CREAM,
+      boxShadow: SHADOWS.CARD,
+    }}
+  >
+    <ConciergeBell size={18} />
+    Request a Service
+  </button>
+</div>
     </section>
   );
 }
@@ -1399,6 +1433,7 @@ function FieldInput({
         )}
 
         {label}
+        
       </label>
 
       <input
@@ -1412,6 +1447,7 @@ function FieldInput({
           "--tw-ring-color": "rgba(200,169,106,0.25)",
         }}
       />
+      
     </div>
   );
 }

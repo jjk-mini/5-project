@@ -111,7 +111,7 @@ if (search.trim()) {
     ).toLowerCase();
 
     const view = String(
-      room.view || ""
+      room.bar|| ""
     ).toLowerCase();
 
     return (
@@ -933,7 +933,7 @@ transform: "scale(1.05)",
                           }}
                         />
 
-                        {room.view ||
+                        {room.bar ||
                           "-"}
                       </div>
                     </div>

@@ -13,6 +13,7 @@ import {
   ClockIcon,
   UserGroupIcon,
   PlayIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import { COLORS, FONTS, SHADOWS, BORDER_RADIUS } from "../constants/theme";
 import { AwardIcon, QuoteIcon } from "lucide-react";
@@ -124,7 +125,7 @@ export default function AboutUsPage() {
       style={{ fontFamily: FONTS.BODY, background: COLORS.BACKGROUND, color: COLORS.TEXT_PRIMARY }}
     >
       {/* Hero Section */}
-      <section className="relative min-h-[65vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -136,8 +137,8 @@ export default function AboutUsPage() {
           className="absolute inset-0"
           style={{
             background: `
-              linear-gradient(135deg, rgba(31,26,23,0.92) 0%, rgba(31,26,23,0.6) 50%, rgba(31,26,23,0.3) 80%, rgba(31,26,23,0.1) 100%),
-              linear-gradient(to bottom, rgba(31,26,23,0.2) 0%, transparent 40%, transparent 60%, rgba(31,26,23,0.4) 100%)
+              linear-gradient(135deg, rgba(31,26,23,0.95) 0%, rgba(31,26,23,0.7) 40%, rgba(31,26,23,0.4) 70%, rgba(31,26,23,0.15) 100%),
+              linear-gradient(to bottom, rgba(31,26,23,0.3) 0%, transparent 30%, transparent 60%, rgba(31,26,23,0.6) 100%)
             `
           }}
         />
@@ -157,8 +158,8 @@ export default function AboutUsPage() {
                 style={{
                   color: COLORS.ACCENT,
                   fontFamily: FONTS.BODY,
-                  background: `rgba(212, 168, 130, 0.12)`,
-                  border: `1px solid rgba(212, 168, 130, 0.15)`,
+                  background: `rgba(212, 168, 130, 0.15)`,
+                  border: `1px solid rgba(212, 168, 130, 0.2)`,
                   backdropFilter: "blur(10px)"
                 }}
               >
@@ -176,7 +177,8 @@ export default function AboutUsPage() {
               style={{ 
                 fontFamily: FONTS.HEADING, 
                 color: COLORS.CREAM,
-                letterSpacing: "-0.03em"
+                letterSpacing: "-0.03em",
+                textShadow: "0 2px 20px rgba(0,0,0,0.2)"
               }}
             >
               Three Decades of<br />
@@ -187,8 +189,11 @@ export default function AboutUsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="max-w-xl text-base font-light leading-[1.8]"
-              style={{ color: "rgba(248,246,243,0.8)" }}
+              className="max-w-xl text-base md:text-lg font-light leading-[1.8]"
+              style={{ 
+                color: "rgba(248,246,243,0.85)",
+                textShadow: "0 1px 12px rgba(0,0,0,0.15)"
+              }}
             >
               LuxuryStay was built on a simple belief: true luxury isn't about
               grandeur, it's about being truly seen and cared for.
@@ -198,20 +203,52 @@ export default function AboutUsPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-8 flex items-center gap-4"
+              className="mt-8 flex flex-wrap items-center gap-6"
+            >
+              <div className="flex items-center gap-6">
+                <div>
+                  <p className="text-2xl font-light" style={{ color: COLORS.CREAM }}>30+</p>
+                  <p className="text-xs uppercase tracking-[0.15em]" style={{ color: "rgba(248,246,243,0.5)" }}>Years</p>
+                </div>
+                <div className="w-px h-10" style={{ background: "rgba(248,246,243,0.15)" }} />
+                <div>
+                  <p className="text-2xl font-light" style={{ color: COLORS.CREAM }}>50k+</p>
+                  <p className="text-xs uppercase tracking-[0.15em]" style={{ color: "rgba(248,246,243,0.5)" }}>Guests</p>
+                </div>
+                <div className="w-px h-10" style={{ background: "rgba(248,246,243,0.15)" }} />
+                <div>
+                  <p className="text-2xl font-light" style={{ color: COLORS.ACCENT }}>4.9★</p>
+                  <p className="text-xs uppercase tracking-[0.15em]" style={{ color: "rgba(248,246,243,0.5)" }}>Rating</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.35 }}
+              className="mt-8 flex flex-wrap gap-4"
             >
               <HashLink 
-  to="#values" 
-  className={`${btnPrimaryClass}`} 
-  style={btnPrimary}
-  smooth
->
-  Discover Our Values
-  <ArrowRightIcon className="w-4 h-4" />
-</HashLink>
-              <span className="text-xs" style={{ color: "rgba(248,246,243,0.3)" }}>
-                or scroll to explore
-              </span>
+                to="#values" 
+                className={`${btnPrimaryClass}`} 
+                style={btnPrimary}
+                smooth
+              >
+                Discover Our Values
+                <ArrowRightIcon className="w-4 h-4" />
+              </HashLink>
+              <Link
+                to="/rooms"
+                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-full transition-all duration-300 hover:bg-white/10"
+                style={{
+                  color: COLORS.CREAM,
+                  border: `1px solid rgba(248,246,243,0.2)`,
+                }}
+              >
+                <PlayIcon className="w-4 h-4" />
+                Explore Rooms
+              </Link>
             </motion.div>
           </div>
         </div>
@@ -240,40 +277,45 @@ export default function AboutUsPage() {
           <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-[1fr_1.1fr] md:gap-[60px]">
             <motion.div {...fadeUp} className="grid grid-cols-2 gap-3">
               <div className="space-y-3">
-                <img
-                  src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=400&q=80"
-                  alt="Hotel lobby"
-                  className="h-[220px] w-full object-cover"
-                  style={{ borderRadius: BORDER_RADIUS.LARGE }}
-                />
-                <img
-                  src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=80"
-                  alt="Restaurant"
-                  className="h-[160px] w-full object-cover"
-                  style={{ borderRadius: BORDER_RADIUS.LARGE }}
-                />
+                <div className="relative overflow-hidden rounded-2xl h-[220px]">
+                  <img
+                    src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=400&q=80"
+                    alt="Hotel lobby"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
+                </div>
+                <div className="relative overflow-hidden rounded-2xl h-[160px]">
+                  <img
+                    src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&q=80"
+                    alt="Restaurant"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
+                </div>
               </div>
               <div className="space-y-3 mt-8">
-                <img
-                  src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=400&q=80"
-                  alt="Hotel suite"
-                  className="h-[160px] w-full object-cover"
-                  style={{ borderRadius: BORDER_RADIUS.LARGE }}
-                />
-                <img
-                  src="https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=400&q=80"
-                  alt="Spa"
-                  className="h-[220px] w-full object-cover"
-                  style={{ borderRadius: BORDER_RADIUS.LARGE }}
-                />
+                <div className="relative overflow-hidden rounded-2xl h-[160px]">
+                  <img
+                    src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=400&q=80"
+                    alt="Hotel suite"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
+                </div>
+                <div className="relative overflow-hidden rounded-2xl h-[220px]">
+                  <img
+                    src="https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=400&q=80"
+                    alt="Spa"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
+                </div>
               </div>
             </motion.div>
 
             <motion.div {...fadeUp}>
-              <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] mb-4" style={sectionLabel}>
-                <span className="h-px w-5" style={sectionLine} />
-                Who We Are
-              </p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4" style={{ background: `rgba(212, 168, 130, 0.1)` }}>
+                <span className="text-[10px] uppercase tracking-[0.1em]" style={sectionLabel}>
+                  Who We Are
+                </span>
+              </div>
               <h2 className="mt-0 mb-4 text-3xl md:text-4xl font-light leading-[1.2]" style={sectionTitle}>
                 A Legacy Built on<br />
                 <span className="font-medium" style={{ color: COLORS.TEXT_PRIMARY }}>Genuine Hospitality</span>
@@ -293,9 +335,9 @@ export default function AboutUsPage() {
                 {STORY_POINTS.map((point) => {
                   const Icon = point.icon;
                   return (
-                    <div key={point.text} className="flex items-start gap-3">
+                    <div key={point.text} className="flex items-start gap-3 group">
                       <div
-                        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full mt-0.5"
+                        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full mt-0.5 transition-all duration-300 group-hover:scale-110"
                         style={{ 
                           background: `rgba(212, 168, 130, 0.1)`,
                           border: `1px solid rgba(212, 168, 130, 0.15)`
@@ -338,7 +380,7 @@ export default function AboutUsPage() {
                   className="text-center group"
                 >
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 transition-all duration-300 group-hover:scale-110"
-                    style={{ background: `rgba(212, 168, 130, 0.12)` }}
+                    style={{ background: `rgba(212, 168, 130, 0.15)` }}
                   >
                     <Icon className="h-6 w-6" style={{ color: COLORS.ACCENT }} />
                   </div>
@@ -358,11 +400,11 @@ export default function AboutUsPage() {
       {/* Values Section */}
       <section id="values" className="px-4 py-16 md:py-24 sm:px-8 md:px-[60px]" style={{ background: COLORS.SURFACE }}>
         <motion.div {...fadeUp} className="mb-12 text-center">
-          <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] mb-4" style={sectionLabel}>
-            <span className="h-px w-5" style={sectionLine} />
-            What Drives Us
-            <span className="h-px w-5" style={sectionLine} />
-          </p>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4" style={{ background: `rgba(212, 168, 130, 0.1)` }}>
+            <span className="text-[10px] uppercase tracking-[0.1em]" style={sectionLabel}>
+              What Drives Us
+            </span>
+          </div>
           <h2 className="mt-0 mb-3 text-3xl md:text-4xl font-light" style={sectionTitle}>
             Our Values
           </h2>
@@ -379,7 +421,7 @@ export default function AboutUsPage() {
                 key={v.title}
                 {...fadeUp}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="group px-6 py-8 text-center transition-all duration-300 hover:-translate-y-1"
+                className="group px-6 py-8 text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                 style={{ 
                   background: COLORS.BACKGROUND, 
                   border: `1px solid ${COLORS.BORDER}`,
@@ -400,15 +442,15 @@ export default function AboutUsPage() {
         </div>
       </section>
 
-      {/* Testimonials Section - Darkened Background */}
+      {/* Testimonials Section */}
       <section className="px-4 py-16 md:py-20 sm:px-8 md:px-[60px]" style={{ background: COLORS.PRIMARY }}>
         <div className="mx-auto max-w-[900px]">
           <motion.div {...fadeUp} className="text-center mb-12">
-            <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] mb-4" style={{ color: COLORS.ACCENT, fontFamily: FONTS.BODY }}>
-              <span className="h-px w-5" style={{ background: COLORS.ACCENT }} />
-              Guest Voices
-              <span className="h-px w-5" style={{ background: COLORS.ACCENT }} />
-            </p>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4" style={{ background: `rgba(212, 168, 130, 0.15)` }}>
+              <span className="text-[10px] uppercase tracking-[0.1em]" style={{ color: COLORS.ACCENT, fontFamily: FONTS.BODY }}>
+                Guest Voices
+              </span>
+            </div>
             <h2 className="mt-0 mb-3 text-3xl md:text-4xl font-light" style={{ fontFamily: FONTS.HEADING, color: COLORS.CREAM }}>
               What Our Guests Say
             </h2>
@@ -420,7 +462,7 @@ export default function AboutUsPage() {
                 key={i}
                 {...fadeUp}
                 transition={{ delay: i * 0.1 }}
-                className="p-8 transition-all duration-300 hover:shadow-xl"
+                className="p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
                 style={{
                   background: `rgba(248,246,243,0.06)`,
                   border: `1px solid rgba(248,246,243,0.08)`,
@@ -449,11 +491,11 @@ export default function AboutUsPage() {
       {/* Leadership Section */}
       <section className="px-4 py-16 md:py-24 sm:px-8 md:px-12 lg:px-[60px]" style={{ background: COLORS.SURFACE }}>
         <motion.div {...fadeUp} className="mb-12 text-center">
-          <p className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] mb-4" style={sectionLabel}>
-            <span className="h-px w-5" style={sectionLine} />
-            Meet The Team
-            <span className="h-px w-5" style={sectionLine} />
-          </p>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4" style={{ background: `rgba(212, 168, 130, 0.1)` }}>
+            <span className="text-[10px] uppercase tracking-[0.1em]" style={sectionLabel}>
+              Meet The Team
+            </span>
+          </div>
           <h2 className="mt-0 mb-3 text-3xl md:text-4xl font-light" style={sectionTitle}>
             The People Behind Your Stay
           </h2>
@@ -468,7 +510,7 @@ export default function AboutUsPage() {
               key={person.name}
               {...fadeUp}
               transition={{ duration: 0.4, delay: i * 0.08 }}
-              className="group overflow-hidden transition-all duration-300 hover:-translate-y-1"
+              className="group overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
               style={{
                 background: COLORS.BACKGROUND,
                 border: `1px solid ${COLORS.BORDER}`,
@@ -483,8 +525,13 @@ export default function AboutUsPage() {
                   className="h-[240px] w-full object-cover transition-transform duration-500 group-hover:scale-105" 
                 />
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: `linear-gradient(to top, rgba(31,26,23,0.4), transparent)` }}
+                  style={{ background: `linear-gradient(to top, rgba(31,26,23,0.6), transparent 60%)` }}
                 />
+                <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="px-2.5 py-1 text-[10px] font-semibold rounded-full bg-white/20 backdrop-blur-sm text-white">
+                    ✦ {person.role.split(' ')[0]}
+                  </span>
+                </div>
               </div>
               <div className="p-5 text-center">
                 <h3 className="mt-0 mb-1 text-[16px] font-medium" style={sectionTitle}>{person.name}</h3>
@@ -496,85 +543,85 @@ export default function AboutUsPage() {
         </div>
       </section>
 
-      {/* CTA Section - Changed Background */}
-      <section className="relative px-4 py-20 md:py-28 sm:px-8 md:px-[60px] overflow-hidden" style={{ 
-        background: `linear-gradient(135deg, ${COLORS.BACKGROUND} 0%, ${COLORS.SURFACE} 100%)`,
-        borderTop: `1px solid ${COLORS.BORDER}`,
-        borderBottom: `1px solid ${COLORS.BORDER}`,
-      }}>
-        {/* Subtle pattern */}
-        <div className="absolute inset-0 opacity-30" style={{
-          backgroundImage: `radial-gradient(circle at 50% 50%, ${COLORS.ACCENT} 1px, transparent 1px)`,
-          backgroundSize: '40px 40px'
-        }} />
-
-        <motion.div {...fadeUp} className="relative mx-auto max-w-[650px] text-center">
-          {/* Icon with ring */}
-          <div className="relative inline-block mb-8">
-            <div className="absolute inset-0 rounded-full animate-ping" style={{ 
-              background: `rgba(212, 168, 130, 0.15)`,
-              animationDuration: '2s'
-            }} />
-            <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-full"
-              style={{ 
-                background: `rgba(212, 168, 130, 0.1)`,
-                border: `2px solid rgba(212, 168, 130, 0.15)`
-              }}
-            >
-              <HeartIcon className="w-10 h-10" style={{ color: COLORS.ACCENT }} />
-            </div>
-          </div>
-          
-          <h2 className="mt-0 mb-4 text-3xl md:text-4xl font-light" style={{ 
-            fontFamily: FONTS.HEADING, 
-            color: COLORS.TEXT_PRIMARY,
-            letterSpacing: "-0.02em"
-          }}>
-            Come Experience It Yourself
-          </h2>
-          
-          <p className="mt-0 mb-8 text-[15px] font-light leading-[1.8] max-w-xl mx-auto" style={{ 
-            color: COLORS.TEXT_SECONDARY,
-            fontFamily: FONTS.BODY
-          }}>
-            Words only carry a story so far. We'd love to welcome you in
-            person and show you what three decades of care actually feels like.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link 
-              to="/rooms" 
-              className="inline-flex items-center gap-2 px-8 py-4 text-sm font-medium rounded-full transition-all duration-300 hover:scale-105 group"
-              style={{ 
-                background: COLORS.PRIMARY, 
-                color: COLORS.CREAM, 
-                fontFamily: FONTS.BODY,
-                boxShadow: `0 4px 24px rgba(92,26,43,0.25)`,
-              }}
-            >
-              Book Your Stay
-              <ArrowRightIcon className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>
-            
-            <Link 
-              to="/gallery" 
-              className="inline-flex items-center gap-2 px-8 py-4 text-sm font-medium rounded-full transition-all duration-300 hover:bg-black/5"
-              style={{ 
-                color: COLORS.TEXT_PRIMARY, 
-                fontFamily: FONTS.BODY,
-                border: `1px solid ${COLORS.BORDER}`,
-              }}
-            >
-              <PlayIcon className="w-4 h-4" />
-              View Gallery
-            </Link>
-          </div>
-          
-          <p className="mt-6 text-xs" style={{ color: COLORS.TEXT_SECONDARY, opacity: 0.5 }}>
-            Join thousands of satisfied guests
-          </p>
-        </motion.div>
-      </section>
+      {/* CTA Section */}
+      <section className="px-4 py-20 md:py-28 sm:px-8 md:px-12 lg:px-[60px] relative overflow-hidden">
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(135deg, ${COLORS.PRIMARY} 0%, #3B2F28 100%)`,
+                }}
+              />
+              <div className="absolute inset-0 opacity-10" style={{
+                backgroundImage: `radial-gradient(circle at 50% 50%, ${COLORS.ACCENT} 2px, transparent 2px)`,
+                backgroundSize: '60px 60px'
+              }} />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-px" style={{ background: `linear-gradient(to right, transparent, ${COLORS.ACCENT}, transparent)` }} />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-px" style={{ background: `linear-gradient(to right, transparent, ${COLORS.ACCENT}, transparent)` }} />
+      
+              <motion.div {...fadeUp} className="relative mx-auto max-w-[800px] text-center">
+                <div className="relative inline-block mb-8">
+                  <div className="absolute inset-0 rounded-full animate-ping" style={{ 
+                    background: `rgba(212, 168, 130, 0.2)`,
+                    animationDuration: '2s'
+                  }} />
+                  <div
+                    className="relative inline-flex items-center justify-center w-20 h-20 rounded-full"
+                    style={{
+                      background: `rgba(212, 168, 130, 0.15)`,
+                      border: `2px solid rgba(212, 168, 130, 0.2)`,
+                    }}
+                  >
+                    <HeartIcon className="w-10 h-10" style={{ color: COLORS.ACCENT }} />
+                  </div>
+                </div>
+      
+                <h2
+                  className="text-3xl md:text-5xl font-light"
+                  style={{
+                    fontFamily: FONTS.HEADING,
+                    color: COLORS.CREAM,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  Ready For A Stay Like No Other?
+                </h2>
+      
+                <p
+                  className="max-w-2xl mx-auto mt-4 text-base leading-relaxed"
+                  style={{ color: "rgba(248,246,243,0.75)" }}
+                >
+                  Every amenity, every detail, every moment — designed around you.
+                  Book your room and experience it firsthand.
+                </p>
+      
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+                  <Link
+                    to="/rooms"
+                    className="inline-flex items-center gap-3 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300 hover:scale-105 group"
+                    style={{
+                      background: COLORS.ACCENT,
+                      color: COLORS.PRIMARY,
+                      boxShadow: `0 4px 24px rgba(212, 168, 130, 0.3)`,
+                    }}
+                  >
+                    Book Your Stay
+                    <ArrowRightIcon className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </Link>
+                  <Link
+                    to="/services"
+                    className="inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300 hover:bg-white/10"
+                    style={{
+                      color: COLORS.CREAM,
+                      border: `1px solid rgba(248,246,243,0.2)`,
+                    }}
+                  >
+                    <PlayIcon className="w-5 h-5" />
+                    Explore Services
+                  </Link>
+                </div>
+              </motion.div>
+            </section>
+      
     </div>
   );
 }
