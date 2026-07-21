@@ -28,7 +28,8 @@ YAxis,
 // Helpers
 // -----------------------------------------------------
 
-const fmtMoney = (n = 0) => `$${Number(n).toLocaleString()}`;
+const fmtMoney = (n = 0) =>
+  `PKR ${Number(n).toLocaleString("en-PK")}`;
 
 // -----------------------------------------------------
 // Small Building Blocks
@@ -608,7 +609,7 @@ fontFamily: FONTS.BODY,
           />
         }
         label="Outstanding Bills"
-        value="$2.3k"
+      value="PKR 2.3k"
         sub="Awaiting payment"
         subColor={COLORS.WARNING}
       />
@@ -1206,7 +1207,7 @@ fontFamily: FONTS.BODY,
                             month.bookings
                         )
                       )
-                    : "$0"}
+                    : "PKR 0" }
                 </td>
 
                 <td

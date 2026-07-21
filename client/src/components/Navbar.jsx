@@ -18,12 +18,13 @@ import {
 
 const PUBLIC_LINKS = [
   { label: "Home", path: "/" },
-  { label: "Rooms", path: "/rooms" },
   { label: "About", path: "/#about" },
-  { label: "Services", path: "/services" },
+  { label: "Services", path: "/HomeService" },
   { label: "Contact", path: "/contact" },
+  { label: "Gallery", path: "/gallery" },
+  { label: "Rooms", path: "/rooms" },
+  { label: "Feedback", path: "/guest/feedback" },
 ];
-
 
 const GUEST_LINKS = [
   { label: "Home", path: "/" },
@@ -35,19 +36,20 @@ const GUEST_LINKS = [
   { label: "Feedback", path: "/guest/feedback" },
 ];
 
-const ADMIN_LINK = [
+// Admin links - same as guest links but with admin dashboard
+const ADMIN_LINKS = [
   { label: "Home", path: "/" },
-  { label: "About", path: "/#about" },
-  { label: "Services", path: "/HomeService" },
-  { label: "Contact", path: "/contact" },
-  { label: "Gallery", path: "/gallery" },
-  { label: "Rooms", path: "/rooms" },
-  { label: "Feedback", path: "/guest/feedback" },
+  { label: "Dashboard", path: "/admin/dashboard" },
+  { label: "Rooms", path: "/admin/rooms" },
+  { label: "Bookings", path: "/admin/bookings" },
+  { label: "Services", path: "/admin/services" },
+  // { label: "Contact", path: "/contact" },
+  // { label: "Gallery", path: "/gallery" },
+  // { label: "Feedback", path: "/guest/feedback" },
 ];
 
 const STAFF_ROLES = [ROLES.ADMIN, ROLES.MANAGER, ROLES.RECEPTIONIST, ROLES.HOUSEKEEPING];
 
-// Turns a createdAt timestamp into "5m ago" / "1h ago" / "Yesterday" style text.
 const timeAgo = (dateStr) => {
   const diffMs = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diffMs / 60000);
@@ -79,7 +81,6 @@ export default function Navbar() {
 
   const initials = getInitials(user?.name);
 
-//  notification 
   useEffect(() => {
     if (!isAuthenticated) return;
 
@@ -91,7 +92,7 @@ export default function Navbar() {
         setNotifications(res.data?.notifications || []);
         setUnreadCount(res.data?.unreadCount || 0);
       } catch {
-        
+        // Silent fail
       }
     };
 
@@ -110,6 +111,7 @@ export default function Navbar() {
       try {
         await notificationApi.markAsRead(n._id);
       } catch {
+        // Silent fail
       }
     }
     if (n.link) navigate(n.link);
@@ -140,8 +142,6 @@ export default function Navbar() {
   };
 
   const isActive = (path) => location.pathname === path;
-
-// notification 
 
   const NotificationBell = ({ dark }) => (
     <div ref={notifRef} style={{ position: "relative" }}>
@@ -232,7 +232,6 @@ export default function Navbar() {
     </div>
   );
 
-  // profile avatar
   const ProfileMenu = () => (
     <div ref={profileRef} style={{ position: "relative" }}>
       <button
@@ -326,33 +325,124 @@ export default function Navbar() {
     </div>
   );
 
-
+  // ── STAFF / ADMIN MODE - Same UI as Guest ──
   if (isStaff) {
+    const linkStyle = (path) => ({
+      fontFamily: FONTS.BODY,
+      fontSize: "13px",
+      color: COLORS.CREAM,
+      opacity: isActive(path) ? 1 : 0.72,
+      padding: "7px 15px",
+      borderRadius: "9px",
+      textDecoration: "none",
+      background: isActive(path) ? "rgba(243,229,216,0.16)" : "transparent",
+      whiteSpace: "nowrap",
+      transition: "opacity 0.15s ease, background 0.15s ease",
+    });
+
     return (
-      <header
-        className="lg:ml-[--sidebar-w]"
-        style={{
-          "--sidebar-w": `${SIDEBAR_WIDTH}px`,
-          height: "64px",
-          background: COLORS.PRIMARY,
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "flex-end",
-          gap: "10px",
-          padding: "0 24px",
-          position: "sticky",
-          top: 0,
-          zIndex: 1000,
-        }}
-      >
-        <NotificationBell dark />
-        <ProfileMenu />
-      </header>
+      <>
+        <style>{`
+          .nav-links-desktop { display: flex; }
+          .nav-hamburger { display: none; }
+          @media (max-width: 768px) {
+            .nav-links-desktop { display: none; }
+            .nav-hamburger { display: flex; }
+          }
+          .nav-link:hover { opacity: 1 !important; background: rgba(243,229,216,0.1) !important; }
+        `}</style>
+
+        <nav
+          className="lg:ml-[--sidebar-w]"
+          style={{
+            "--sidebar-w": `${SIDEBAR_WIDTH}px`,
+            background: COLORS.PRIMARY,
+            borderBottom: `2px solid ${COLORS.ACCENT}`,
+            display: "flex",
+            alignItems: "center",
+            padding: "0 24px",
+            height: "64px",
+            position: "sticky",
+            top: 0,
+            zIndex: 1000,
+            boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
+          }}
+        >
+          <Link to="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", marginRight: "36px", flexShrink: 0 }}>
+            <img src={Logo} alt="LuxuryStay Logo" style={{ height: "46px", width: "auto", objectFit: "contain" }} />
+            <span style={{ fontFamily: FONTS.HEADING, fontSize: "15px", color: COLORS.ACCENT }}>
+              LuxuryStay
+            </span>
+          </Link>
+
+          <div className="nav-links-desktop" style={{ flex: 1, alignItems: "center", justifyContent: "center", gap: "2px" }}>
+            {ADMIN_LINKS.map((link) => (
+              <HashLink key={link.path} smooth to={link.path} className="nav-link" style={linkStyle(link.path)}>
+                {link.label}
+              </HashLink>
+            ))}
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto", flexShrink: 0 }}>
+            <NotificationBell dark />
+            <ProfileMenu />
+          </div>
+
+          <button
+            className="nav-hamburger"
+            onClick={() => setSheetOpen(true)}
+            aria-label="Open menu"
+            style={{
+              background: "none", border: "none",
+              cursor: "pointer", color: COLORS.CREAM,
+              marginLeft: "12px", padding: "4px",
+              alignItems: "center", justifyContent: "center",
+            }}
+          >
+            <Bars3Icon style={{ width: 24, height: 24 }} />
+          </button>
+        </nav>
+
+        {sheetOpen && (
+          <div onClick={() => setSheetOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1200 }} />
+        )}
+
+        {sheetOpen && (
+          <div style={{
+            position: "fixed", bottom: 0, left: 0, right: 0,
+            background: "#FFFFFF",
+            borderRadius: "20px 20px 0 0",
+            zIndex: 1300, overflow: "hidden",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px 8px" }}>
+              <span style={{ fontFamily: FONTS.HEADING, fontSize: "14px", color: COLORS.TEXT_PRIMARY }}>Menu</span>
+              <button onClick={() => setSheetOpen(false)} aria-label="Close menu" style={{ background: "none", border: "none", cursor: "pointer", color: COLORS.TEXT_SECONDARY, padding: "4px" }}>
+                <XMarkIcon style={{ width: 20, height: 20 }} />
+              </button>
+            </div>
+
+            {ADMIN_LINKS.map((link) => (
+              <Link key={link.path} to={link.path} onClick={() => setSheetOpen(false)}
+                style={{ display: "flex", alignItems: "center", padding: "15px 20px", fontSize: "14px", color: COLORS.TEXT_PRIMARY, borderBottom: `0.5px solid ${COLORS.BORDER}`, textDecoration: "none" }}>
+                {link.label}
+              </Link>
+            ))}
+            <Link to="/profile" onClick={() => setSheetOpen(false)}
+              style={{ display: "flex", alignItems: "center", padding: "15px 20px", fontSize: "14px", color: COLORS.TEXT_PRIMARY, borderBottom: `0.5px solid ${COLORS.BORDER}`, textDecoration: "none" }}>
+              Profile
+            </Link>
+            <button onClick={handleLogout}
+              style={{ display: "flex", alignItems: "center", padding: "15px 20px", fontSize: "14px", color: COLORS.ERROR, background: "none", border: "none", width: "100%", cursor: "pointer", textAlign: "left" }}>
+              Sign out
+            </button>
+            <div style={{ height: "24px" }} />
+          </div>
+        )}
+      </>
     );
   }
 
-// loged in guesy navbar
+  // ── LOGGED IN GUEST MODE ──
   if (isGuestUser) {
     const linkStyle = (path) => ({
       fontFamily: FONTS.BODY,
@@ -391,7 +481,6 @@ export default function Navbar() {
           zIndex: 1000,
           boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
         }}>
-
           <Link to="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", marginRight: "36px", flexShrink: 0 }}>
             <img src={Logo} alt="LuxuryStay Logo" style={{ height: "46px", width: "auto", objectFit: "contain" }} />
             <span style={{ fontFamily: FONTS.HEADING, fontSize: "15px", color: COLORS.ACCENT }}>
@@ -425,7 +514,6 @@ export default function Navbar() {
           >
             <Bars3Icon style={{ width: 24, height: 24 }} />
           </button>
-
         </nav>
 
         {sheetOpen && (
@@ -467,9 +555,7 @@ export default function Navbar() {
     );
   }
 
-  // ══════════════════════════════════════════════════════════════════
-  // PUBLIC MODE — logged out visitors.
-  // ══════════════════════════════════════════════════════════════════
+  // ── PUBLIC MODE (Logged out) ──
   return (
     <>
       <style>{`
@@ -498,7 +584,6 @@ export default function Navbar() {
         zIndex: 1000,
         boxShadow: "0 2px 12px rgba(0,0,0,0.12)",
       }}>
-
         <Link to="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", marginRight: "36px", flexShrink: 0 }}>
           <img src={Logo} alt="LuxuryStay Logo" style={{ height: "46px", width: "auto", objectFit: "contain" }} />
           <span style={{ fontFamily: FONTS.HEADING, fontSize: "15px", color: COLORS.ACCENT }}>
@@ -542,7 +627,6 @@ export default function Navbar() {
         }}>
           <Bars3Icon style={{ width: 24, height: 24 }} />
         </button>
-
       </nav>
 
       {sheetOpen && (

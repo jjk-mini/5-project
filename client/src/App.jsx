@@ -28,7 +28,7 @@ import RoomManagement from "./pages/RoomManagement"
 import CheckInOut from "./pages/CheckInOut"
 import HousekeepingPage from "./pages/HousekeepingDashboard"
 import MaintenanceRequestsPage from "./pages/MaintenanceRequestsPage"
-
+import NewServicePage from "./pages/AddServicePage";
 import ReportsPage from "./pages/ReportsPage"
 import FeedbackPage from "./pages/FeedbackPage"
 import Accommodations from "./pages/Accommodations"
@@ -52,6 +52,7 @@ import ServiceCatalogPage from "./pages/ServiceCatalogPage";
 import NewBookingPage from "./pages/NewBookingPage";
 import EditBookingPage from "./pages/EditBookingPage";
 import BillingManagementPage from "./pages/BillingManagementPage"
+import SettingsPage from "./pages/SettingPage";
 
 function Placeholder({ title, owner }) {
   return (
@@ -223,16 +224,16 @@ export default function App(){
           </RoleRoute>
         </Layout>
       } />
-{/* settings dekhni hai  */}
-            <Route path="/admin/setting" element={
-        <Layout showFooter={false} showNav={false}>
-          <RoleRoute allowedRoles={[ROLES.ADMIN, ]}>
-            <placeholder title="Settings" owner="You" />
-          </RoleRoute>
-        </Layout>
-      } />
+
+<Route path="/settings" element={<SettingsPage />} />
 
 {/* housekeeping */}
+<Route
+  path="/services/newService"
+  element={<NewServicePage />}
+/>
+
+
 
       <Route path="/housekeeping/dashboard" element={
         <Layout showFooter={false} showNav={false}>

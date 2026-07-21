@@ -130,8 +130,14 @@ function AdminDashboard() {
 
   const stats = [
     { label: "Occupancy", value: statsLoading ? "\u2014" : `${dashboardStats?.occupancyRate ?? 0}%`, icon: Percent, color: COLORS.INFO },
-    { label: "Revenue", value: statsLoading ? "\u2014" : `$${(dashboardStats?.revenueToday ?? 0).toLocaleString()}`, icon: DollarSign, color: COLORS.SUCCESS },
-    { label: "Total Rooms", value: statsLoading ? "\u2014" : `${dashboardStats?.totalRooms ?? 0}`, icon: BedDouble, color: COLORS.PRIMARY },
+{
+  label: "Revenue",
+  value: statsLoading
+    ? "—"
+    : `PKR ${(dashboardStats?.revenueToday ?? 0).toLocaleString("en-PK")}`,
+  icon: DollarSign,
+  color: COLORS.SUCCESS
+},    { label: "Total Rooms", value: statsLoading ? "\u2014" : `${dashboardStats?.totalRooms ?? 0}`, icon: BedDouble, color: COLORS.PRIMARY },
     { label: "Bookings Today", value: statsLoading ? "\u2014" : `${dashboardStats?.bookingsToday ?? 0}`, icon: CalendarCheck, color: COLORS.WARNING },
   ];
 
